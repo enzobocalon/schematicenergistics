@@ -1,4 +1,4 @@
-<img alt="logo" height="128" src="https://raw.githubusercontent.com/enzobocalon/schematicenergistics/refs/heads/main/docs/logo.png?token=GHSAT0AAAAAACVFPNKCJDWNUN22IJQCLOUQ2CGF3DA" width="128"/>
+<img alt="logo" height="128" src="https://github.com/enzobocalon/schematicenergistics/blob/main/docs/logo.png?raw=true" width="128"/>
 
 
 ## About
