@@ -149,6 +149,12 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
+jar {
+    archiveBaseName.set(mod_id)          // "schematicenergistics"
+    archiveVersion.set(mod_version)      // "1.0.0"
+    archiveAppendix.set(minecraft_version)  // "1.21"
+    archiveClassifier.set("")
+}
 
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
