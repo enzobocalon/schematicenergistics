@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "schematicenergistics:block/cannon_interface"
+    }
+  }
+}

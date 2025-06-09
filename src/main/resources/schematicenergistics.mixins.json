@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.schematicenergistics.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "SchematicCannonMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
