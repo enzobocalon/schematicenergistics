@@ -55,56 +55,49 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
     }
 
     public boolean request(AEItemKey what, long amount, boolean simulate) {
-        if (this.getMainNode() == null) return false;
-        if (this.getMainNode().getGrid() == null) return false;
-        MEStorage inventory = (Objects.requireNonNull(this.getMainNode().getGrid())).getStorageService().getInventory();
-        ICraftingService craftingService = this.getMainNode().getGrid().getCraftingService();
-        long itemAmount = inventory.getAvailableStacks().get(what);
-        if (itemAmount >= amount) {
+        var node = this.getMainNode();
+        if (node == null) return false;
+
+        var grid = node.getGrid();
+        if (grid == null) return false;
+
+        var inventory = grid.getStorageService().getInventory();
+        var craftingService = grid.getCraftingService();
+        if (inventory == null || craftingService == null) return false;
+
+        long available = inventory.getAvailableStacks().get(what);
+        if (available >= amount) {
             if (!simulate) {
                 inventory.extract(what, amount, Actionable.MODULATE, this.actionSource);
             }
-
             return true;
-        } else {
-            if (craftingService.isCraftable(what)) {
-                CraftingRequest pendingCraft = this.craftingHelper.getPendingCraft();
-                if (pendingCraft == null) {
-                    this.craftingHelper.startCraft(what, amount);
-                    return false;
-                }
+        }
 
-                if (pendingCraft.getFuture().isDone()) {
-                    try {
-                        ICraftingPlan plan = pendingCraft.getFuture().get();
-                        if (plan.missingItems().isEmpty()) {
-                            ICraftingSubmitResult result = craftingService.submitJob(plan, this, null, false, this.actionSource);
-                            if (result.successful()) {
-                                this.craftingHelper.clearPendingCraft();
-                                return true;
-                            }
-
-                            this.craftingHelper.clearPendingCraft();
-                            return false;
-                        }
-
-                        this.craftingHelper.clearPendingCraft();
-                        return false;
-                    } catch (ExecutionException | InterruptedException ignored) {}
-                }
-            }
-
+        if (this.craftingHelper.getLink() != null) {
             return false;
         }
+
+        if (!craftingService.isCraftable(what)) {
+            return false;
+        }
+
+        if (this.craftingHelper.getPendingCraft() == null) {
+            this.craftingHelper.startCraft(what, amount);
+        }
+
+        return false;
     }
 
+
     public int refill(int currentAmount) {
-        if (this.getMainNode() == null) return 0;
-        if (this.getMainNode().getGrid() == null) return 0;
-        MEStorage inventory = (Objects.requireNonNull(this.getMainNode().getGrid())).getStorageService().getInventory();
+        var node = this.getMainNode();
+        if (node == null) return 0;
+        var grid = node.getGrid();
+        if (grid == null) return 0;
+        MEStorage inventory = grid.getStorageService().getInventory();
         AEItemKey gunpowderKey = AEItemKey.of(Items.GUNPOWDER);
         long available = inventory.getAvailableStacks().get(gunpowderKey);
-        if (available <= 0L) {
+        if (available <= 0) {
             return 0;
         } else {
             int amountToFill = 64 - currentAmount;
@@ -128,23 +121,69 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
     }
 
     public TickingRequest getTickingRequest(IGridNode node) {
-        return new TickingRequest(1, 20, false);
+        return new TickingRequest(1, 5, false);
     }
 
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
-        return TickRateModulation.IDLE;
+        CraftingRequest pending = this.craftingHelper.getPendingCraft();
+
+        if (node == null || !node.isActive()) {
+            return TickRateModulation.IDLE;
+        }
+
+        if (pending != null && pending.getFuture().isDone()) {
+            try {
+                ICraftingPlan plan = pending.getFuture().get();
+
+                if (plan.missingItems().isEmpty()) {
+                    var result = node.getGrid().getCraftingService().submitJob(
+                            plan,
+                            this,
+                            null,
+                            false,
+                            this.actionSource);
+
+                    if (result.successful()) {
+                        this.craftingHelper.setLink(result.link());
+                    }
+                }
+
+            } catch (ExecutionException | InterruptedException e) {
+                e.printStackTrace();
+            } finally {
+                this.craftingHelper.clearPendingCraft();
+            }
+        }
+
+        return TickRateModulation.FASTER;
     }
 
+
     public ImmutableSet<ICraftingLink> getRequestedJobs() {
-        return ImmutableSet.copyOf(new HashSet<>());
+        ICraftingLink link = this.craftingHelper.getLink();
+        if (link != null) return ImmutableSet.of(link);
+        return ImmutableSet.of();
     }
 
     public long insertCraftedItems(ICraftingLink link, AEKey what, long amount, Actionable mode) {
-        if (what instanceof AEItemKey) return 1L;
-         else return 0L;
+        if (!(what instanceof AEItemKey)) return 0;
+        if (!link.equals(this.craftingHelper.getLink())) return 0;
+
+        var node = this.getMainNode();
+        if (node == null) return 0;
+        var grid = node.getGrid();
+        if (grid == null) return 0;
+        MEStorage inventory = grid.getStorageService().getInventory();
+        if (inventory == null) return 0;
+
+        return inventory.insert(what, amount, mode, this.actionSource);
     }
 
-    public void jobStateChange(ICraftingLink link) {}
+    public void jobStateChange(ICraftingLink link) {
+        if (link.equals(this.craftingHelper.getLink())) {
+            this.craftingHelper.setLink(null);
+        }
+    }
 
     public IActionSource getActionSource() {
         return this.actionSource;
