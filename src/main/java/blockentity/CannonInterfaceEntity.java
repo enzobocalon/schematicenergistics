@@ -73,13 +73,13 @@ public class CannonInterfaceEntity extends AENetworkBlockEntity implements IGrid
         }
 
         if (this.craftingHelper.getPendingCraft() == null) {
-            this.craftingHelper.startCraft(what, amount);
+            this.craftingHelper.startCraft(what, amount, CalculationStrategy.REPORT_MISSING_ITEMS);
         }
 
         return false;
     }
 
-    public int refill(int currentAmount) {
+    public int refill(int amount) {
         var node = this.getMainNode();
         if (node == null) return 0;
         var grid = node.getGrid();
@@ -87,12 +87,19 @@ public class CannonInterfaceEntity extends AENetworkBlockEntity implements IGrid
         MEStorage inventory = grid.getStorageService().getInventory();
         AEItemKey gunpowderKey = AEItemKey.of(Items.GUNPOWDER);
         long available = inventory.getAvailableStacks().get(gunpowderKey);
-        if (available <= 0L) {
+        if (available <= 0) {
+            var canCraft = grid.getCraftingService().isCraftable(gunpowderKey);
+            if (!canCraft) {
+                return 0;
+            }
+            if (this.craftingHelper.getLink() != null || this.craftingHelper.getPendingCraft() != null) {
+                return 0;
+            }
+
+            this.craftingHelper.startCraft(gunpowderKey, amount, CalculationStrategy.CRAFT_LESS);
             return 0;
         } else {
-            int amountToFill = 64 - currentAmount;
-            int amountToExtract = (int)Math.min(amountToFill, available);
-            long extracted = inventory.extract(gunpowderKey, amountToExtract, Actionable.MODULATE, this.actionSource);
+            long extracted = inventory.extract(gunpowderKey, amount, Actionable.MODULATE, this.actionSource);
             return (int)extracted;
         }
     }

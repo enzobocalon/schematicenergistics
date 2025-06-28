@@ -20,17 +20,32 @@ public class CraftingHelper {
         this.entity = entity;
     }
 
-    public void startCraft(AEItemKey key, long amount) {
-        ICraftingService service = (Objects.requireNonNull(this.entity.getGridNode())).getGrid().getCraftingService();
-        if (key != null && amount > 0) {
-            if (service.isCraftable(key)) {
-                Level level = this.entity.getLevel();
-                CannonInterfaceEntity entity = this.entity;
-                Future<ICraftingPlan> future = service.beginCraftingCalculation(level, entity::getActionSource, key, amount, CalculationStrategy.REPORT_MISSING_ITEMS);
-                if (future != null) {
-                    this.pendingCraft = new CraftingRequest(key, amount, future);
-                }
-            }
+    public void startCraft(AEItemKey key, long amount, CalculationStrategy strategy) {
+        if (key == null || amount <= 0 || this.entity.getLevel() == null || strategy == null) {
+            return;
+        }
+
+        var node = this.entity.getGridNode();
+        if (node == null) return;
+
+        var grid = node.getGrid();
+        if (grid == null) return;
+
+        var service = grid.getCraftingService();
+        if (!service.isCraftable(key)) {
+            return;
+        }
+
+        var future = service.beginCraftingCalculation(
+                this.entity.getLevel(),
+                entity::getActionSource,
+                key,
+                amount,
+                strategy
+        );
+
+        if (future != null) {
+            this.pendingCraft = new CraftingRequest(key, amount, future);
         }
     }
 
