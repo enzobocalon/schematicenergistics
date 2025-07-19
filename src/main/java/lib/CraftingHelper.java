@@ -3,23 +3,24 @@ package lib;
 import appeng.api.networking.crafting.CalculationStrategy;
 import appeng.api.networking.crafting.ICraftingLink;
 import appeng.api.stacks.AEItemKey;
-import blockentity.CannonInterfaceEntity;
+import logic.CannonInterfaceLogic;
 
 public class CraftingHelper {
     private CraftingRequest pendingCraft;
-    private final CannonInterfaceEntity entity;
+    private final CannonInterfaceLogic cannonLogic;
     private ICraftingLink link;
 
-    public CraftingHelper(CannonInterfaceEntity entity) {
-        this.entity = entity;
+    public CraftingHelper(CannonInterfaceLogic logic) {
+        this.cannonLogic = logic;
     }
 
     public void startCraft(AEItemKey key, long amount, CalculationStrategy strategy) {
-        if (key == null || amount <= 0 || this.entity.getLevel() == null || strategy == null) {
+        var level = this.cannonLogic.getLevel();
+        if (key == null || amount <= 0 || level == null || strategy == null) {
             return;
         }
 
-        var node = this.entity.getGridNode();
+        var node = this.cannonLogic.getGridNode();
         if (node == null) return;
 
         var grid = node.getGrid();
@@ -31,8 +32,8 @@ public class CraftingHelper {
         }
 
         var future = service.beginCraftingCalculation(
-                this.entity.getLevel(),
-                entity::getActionSource,
+                this.cannonLogic.getLevel(),
+                cannonLogic::getActionSource,
                 key,
                 amount,
                 strategy
