@@ -29,23 +29,20 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class CannonInterfaceEntity extends AENetworkedBlockEntity {
+public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGridTickable, ICraftingRequester {
     private @Nullable CannonInterfaceLogic cannonLogic = null;
+    private final IActionSource actionSource;
 
     public CannonInterfaceEntity(BlockPos pos, BlockState state) {
         this(Registration.CANNON_INTERFACE_ENTITY.get(), pos, state);
     }
 
-    public boolean request(AEItemKey what, long amount, boolean simulate) {
-        return this.getLogic().request(what, amount, simulate);
-    }
-
-    public int refill(int amountToRefill) {
-        return this.getLogic().refill(amountToRefill);
-    }
-
     public CannonInterfaceEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState blockState) {
         super(blockEntityType, pos, blockState);
+        this.actionSource = new MachineSource(this);
+        this.getMainNode().setExposedOnSides(this.getExposedSides()).addService(IGridTickable.class, this)
+                .addService(ICraftingRequester.class, this)
+                .setFlags(GridFlags.REQUIRE_CHANNEL);
     }
 
     public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
@@ -59,7 +56,11 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity {
     public void onReady() {
         this.getMainNode().setExposedOnSides(this.getExposedSides());
         if (this.cannonLogic == null && this.getLevel() != null) {
-            this.cannonLogic = new CannonInterfaceLogic(this.getLevel(), this.getMainNode(), this.getExposedSides());
+            this.cannonLogic = new CannonInterfaceLogic(
+                    this.getLevel(),
+                    this.getMainNode(),
+                    this.actionSource,
+                this);
         }
         super.onReady();
     }
@@ -69,13 +70,35 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity {
     }
 
     public CannonInterfaceLogic getLogic() {
-        if (this.cannonLogic == null) {
-            throw new IllegalStateException("CannonInterfaceLogic is not initialized yet.");
-        }
         return this.cannonLogic;
     }
 
     public @Nullable IGridNode getGridNode() {
         return super.getGridNode();
+    }
+
+    @Override
+    public ImmutableSet<ICraftingLink> getRequestedJobs() {
+        return this.getLogic().getRequestedJobs();
+    }
+
+    @Override
+    public long insertCraftedItems(ICraftingLink link, AEKey what, long amount, Actionable mode) {
+        return this.getLogic().insertCraftedItems(link, what, amount, mode);
+    }
+
+    @Override
+    public void jobStateChange(ICraftingLink link) {
+        this.getLogic().jobStateChange(link);
+    }
+
+    @Override
+    public TickingRequest getTickingRequest(IGridNode node) {
+        return this.getLogic().getTickingRequest(node);
+    }
+
+    @Override
+    public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+        return this.getLogic().tickingRequest(node, ticksSinceLastCall);
     }
 }

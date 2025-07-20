@@ -20,6 +20,7 @@ public class CreativeTab {
                     .title(Component.translatable("creativetab.schematicenergistics.title"))
                     .displayItems((displayParameters, output) -> {
                         output.accept(Registration.CANNON_INTERFACE.get());
+                        output.accept(Registration.CANNON_INTERFACE_PART_ITEM.get());
                     })
                     .build()
     );

@@ -1,10 +1,13 @@
 package com.schematicenergistics.mixin;
 
+import appeng.api.parts.IPart;
+import appeng.api.parts.IPartHost;
 import appeng.api.stacks.AEItemKey;
 import blockentity.CannonInterfaceEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonInventory;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
+import logic.CannonInterfaceLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import part.CannonInterfacePart;
 
 @Mixin({SchematicannonBlockEntity.class})
 public abstract class SchematicCannonMixin {
@@ -26,7 +30,7 @@ public abstract class SchematicCannonMixin {
     @Shadow
     public String statusMsg;
 
-    private CannonInterfaceEntity cannonInterface;
+    private CannonInterfaceLogic cannonInterface;
 
     @Inject(
             method = {"findInventories"},
@@ -36,20 +40,27 @@ public abstract class SchematicCannonMixin {
         Level level = ((SchematicannonBlockEntity)(Object)this).getLevel();
         BlockPos pos = ((SchematicannonBlockEntity)(Object)this).getBlockPos();
 
-        CannonInterfaceEntity foundInterface = null;
+        CannonInterfaceLogic logicalHost = null;
         if (level == null) return;
 
         for (Direction dir : Direction.values()) {
             BlockPos neighborPos = pos.relative(dir);
             BlockEntity be = level.getBlockEntity(neighborPos);
             if (be instanceof CannonInterfaceEntity candidateInterface) {
-                foundInterface = candidateInterface;
+                var logic = candidateInterface.getLogic();
+                if (logic == null) continue;
+                logicalHost = candidateInterface.getLogic();
                 break;
+            } else if (be instanceof IPartHost partHost) {
+                IPart part = partHost.getPart(dir.getOpposite());
+                if (part instanceof CannonInterfacePart cannonPart) {
+                    logicalHost = cannonPart.getLogic();
+                }
             }
         }
 
-        if (foundInterface != null) {
-            this.cannonInterface = foundInterface;
+        if (logicalHost != null) {
+            this.cannonInterface = logicalHost;
         } else {
             this.cannonInterface = null;
         }

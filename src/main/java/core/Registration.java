@@ -1,6 +1,8 @@
 package core;
 
 import appeng.api.AECapabilities;
+import appeng.api.networking.IInWorldGridNodeHost;
+import appeng.api.parts.IPart;
 import appeng.api.parts.PartModels;
 import appeng.block.AEBaseBlock;
 import appeng.blockentity.AEBaseBlockEntity;
@@ -32,13 +34,12 @@ public final class Registration {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CannonInterfaceEntity>> CANNON_INTERFACE_ENTITY;
     public static DeferredItem<PartItem<CannonInterfacePart>> CANNON_INTERFACE_PART_ITEM;
 
-
-
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
                 AECapabilities.IN_WORLD_GRID_NODE_HOST,
                 CANNON_INTERFACE_ENTITY.get(),
                 (cInterface, ctx) -> cInterface);
+
     }
 
     public static void init(IEventBus eventBus) {

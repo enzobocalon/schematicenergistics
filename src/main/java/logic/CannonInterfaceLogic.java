@@ -29,30 +29,27 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.concurrent.ExecutionException;
 
-public class CannonInterfaceLogic implements IGridTickable, ICraftingRequester {
+public class CannonInterfaceLogic {
     private final Level level;
     private final IManagedGridNode node;
     private final CraftingHelper craftingHelper;
     private final IActionSource actionSource;
     private final CraftingHelper gunpowderCraftingHelper;
+    private ICraftingRequester requester;
 
-    public CannonInterfaceLogic(Level level, IManagedGridNode node, @Nullable EnumSet<Direction> exposedSides) {
+    public CannonInterfaceLogic(Level level, IManagedGridNode node, IActionSource actionSource, ICraftingRequester requester) {
         this.level = level;
         this.node = node;
-        this.actionSource = new MachineSource(this);
+        this.actionSource = actionSource;
         this.craftingHelper = new CraftingHelper(this);
         this.gunpowderCraftingHelper = new CraftingHelper(this);
-        if (exposedSides != null) {
-            node.setExposedOnSides(exposedSides).addService(IGridTickable.class, this)
-                    .addService(ICraftingRequester.class, this)
-                    .setFlags(GridFlags.REQUIRE_CHANNEL);
-        }
+        this.requester = requester;
     }
 
     public Level getLevel() {
         return this.level;
     }
-    @Override
+
     public ImmutableSet<ICraftingLink> getRequestedJobs() {
         ImmutableSet.Builder<ICraftingLink> builder = ImmutableSet.builder();
         if (this.craftingHelper.getLink() != null)
@@ -63,7 +60,6 @@ public class CannonInterfaceLogic implements IGridTickable, ICraftingRequester {
     }
 
 
-    @Override
     public long insertCraftedItems(ICraftingLink link, AEKey what, long amount, Actionable mode) {
         if (!(what instanceof AEItemKey)) return 0;
         if (!link.equals(this.craftingHelper.getLink()) &&
@@ -81,7 +77,6 @@ public class CannonInterfaceLogic implements IGridTickable, ICraftingRequester {
     }
 
 
-    @Override
     public void jobStateChange(ICraftingLink link) {
         if (link.equals(this.craftingHelper.getLink())) {
             this.craftingHelper.setLink(null);
@@ -150,7 +145,6 @@ public class CannonInterfaceLogic implements IGridTickable, ICraftingRequester {
         }
     }
 
-    @Override
     public @Nullable IGridNode getActionableNode() {
         return this.node.getNode();
     }
@@ -185,7 +179,7 @@ public class CannonInterfaceLogic implements IGridTickable, ICraftingRequester {
                 if (plan.missingItems().isEmpty()) {
                     var result = node.getGrid().getCraftingService().submitJob(
                             plan,
-                            this,
+                            this.requester,
                             null,
                             false,
                             this.actionSource

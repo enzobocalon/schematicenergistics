@@ -1,6 +1,7 @@
 ---
 item_ids: 
 - schematicenergistics:cannon_interface
+- schematicenergistics:cannon_interface_part
 ---
 
 # Cannon Interface
