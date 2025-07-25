@@ -1,6 +1,7 @@
 package com.schematicenergistics;
 
 import appeng.api.ids.AECreativeTabIds;
+import appeng.init.client.InitScreens;
 import core.Registration;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.neoforged.api.distmarker.Dist;
@@ -43,7 +44,12 @@ public class SchematicEnergistics {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {}
 
     private void registerScreens(RegisterMenuScreensEvent event) {
-        event.register(Registration.CANNON_INTERFACE_MENU.get(), CannonInterfaceScreen::new);
+        InitScreens.register(
+                event,
+                Registration.CANNON_INTERFACE_MENU.get(),
+                CannonInterfaceScreen::new,
+                "/screens/cannon_interface.json"
+        );
     }
 
     @SubscribeEvent

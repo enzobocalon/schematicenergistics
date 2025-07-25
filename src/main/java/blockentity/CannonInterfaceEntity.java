@@ -111,7 +111,12 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new CannonInterfaceMenu(i, inventory, this);
+        return new CannonInterfaceMenu(
+                Registration.CANNON_INTERFACE_MENU.get(),
+                i,
+                inventory,
+                this
+        );
     }
 
     @Override

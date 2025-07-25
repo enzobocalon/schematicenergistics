@@ -1,19 +1,25 @@
 package menu;
 
+import appeng.api.parts.IPart;
+import appeng.api.parts.IPartHost;
+import appeng.menu.AEBaseMenu;
+import blockentity.CannonInterfaceEntity;
 import core.Registration;
+import logic.CannonInterfaceLogic;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import part.CannonInterfacePart;
 
-public class CannonInterfaceMenu extends AbstractContainerMenu {
-    private final BlockEntity blockEntity;
-    private final BlockPos pos;
+public class CannonInterfaceMenu extends AEBaseMenu {
     private final Level level;
 
     private static final int INV_START_X = 8;
@@ -24,18 +30,38 @@ public class CannonInterfaceMenu extends AbstractContainerMenu {
 
     private static final int SLOT_SPACING = 18;
 
-    public CannonInterfaceMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
-        this(containerId, playerInv, playerInv.player.level().getBlockEntity(buf.readBlockPos()));
+
+    public CannonInterfaceMenu(int id, Inventory playerInv, FriendlyByteBuf data) {
+        this(Registration.CANNON_INTERFACE_MENU.get(), id, playerInv, getLogicFromBuf(playerInv, data));
     }
 
-    public CannonInterfaceMenu(int containerId, Inventory playerInv, BlockEntity blockEntity) {
-        super(Registration.CANNON_INTERFACE_MENU.get(), containerId);
-        this.blockEntity = blockEntity;
-        this.pos = blockEntity.getBlockPos();
+    public CannonInterfaceMenu(MenuType<?> menuType, int id, Inventory playerInv, Object host) {
+        super(menuType, id, playerInv, host);
+
         this.level = playerInv.player.level();
 
-        addPlayerInventory(playerInv);
-        addPlayerHotbar(playerInv);
+        this.createPlayerInventorySlots(playerInv);
+    }
+
+    private static CannonInterfaceLogic getLogicFromBuf(Inventory inv, FriendlyByteBuf buf) {
+        BlockPos pos = buf.readBlockPos();
+        BlockEntity be = inv.player.level().getBlockEntity(pos);
+        if (be instanceof CannonInterfaceEntity entity) {
+            System.out.println("Found Cannon Interface Entity at " + pos);
+            return entity.getLogic();
+        } else if (be instanceof IPartHost partHost) {
+//            STILL REQUIRES SOME TESTING
+            Direction direction = buf.readEnum(Direction.class);
+            IPart part = partHost.getPart(direction.getOpposite());
+
+            if (part instanceof CannonInterfacePart cannonPart) {
+                System.out.println("Found Cannon Interface Part at " + pos + " in direction " + direction);
+                return cannonPart.getLogic();
+            }
+        } else {
+            throw new IllegalArgumentException("Invalid Buf from Cannon Interface at " + pos);
+        }
+        return null;
     }
 
     @Override
@@ -63,7 +89,6 @@ public class CannonInterfaceMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        if (this.blockEntity == null || blockEntity.isRemoved()) return false;
-        return player.distanceToSqr(pos.getCenter()) <= 64;
+        return true;
     }
 }

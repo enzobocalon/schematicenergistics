@@ -1,0 +1,11 @@
+{
+  "$schema": "schema.json",
+  "includes": [
+    "common/common.json",
+    "common/player_inventory.json"
+  ],
+  "background": {
+    "texture": "guis/cannon_interface_bg.png",
+    "srcRect": [0, 0, 176, 182]
+  }
+}
