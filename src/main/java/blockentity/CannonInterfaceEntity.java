@@ -20,6 +20,7 @@ import java.util.concurrent.ExecutionException;
 import lib.CraftingHelper;
 import lib.CraftingRequest;
 import logic.CannonInterfaceLogic;
+import logic.ICannonInterfaceHost;
 import menu.CannonInterfaceMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -35,7 +36,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGridTickable, ICraftingRequester, MenuProvider {
+public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGridTickable, ICraftingRequester, ICannonInterfaceHost {
     private @Nullable CannonInterfaceLogic cannonLogic = null;
     private final IActionSource actionSource;
 
@@ -106,17 +107,6 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
         return this.getLogic().tickingRequest(node, ticksSinceLastCall);
-    }
-
-    @Nullable
-    @Override
-    public AbstractContainerMenu createMenu(int i, Inventory inventory, Player player) {
-        return new CannonInterfaceMenu(
-                Registration.CANNON_INTERFACE_MENU.get(),
-                i,
-                inventory,
-                this
-        );
     }
 
     @Override

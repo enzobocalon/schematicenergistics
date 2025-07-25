@@ -8,12 +8,17 @@ import appeng.block.AEBaseBlock;
 import appeng.blockentity.AEBaseBlockEntity;
 import appeng.items.parts.PartItem;
 import appeng.items.parts.PartModelsHelper;
+import appeng.menu.AEBaseMenu;
+import appeng.menu.implementations.MenuTypeBuilder;
 import block.CannonInterface;
 import blockentity.CannonInterfaceEntity;
 import blockitem.CannonInterfaceBlockItem;
 import com.schematicenergistics.SchematicEnergistics;
+import logic.CannonInterfaceLogic;
+import logic.ICannonInterfaceHost;
 import menu.CannonInterfaceMenu;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.BlockItem;
@@ -30,6 +35,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import part.CannonInterfacePart;
 import part.CannonInterfacePartItem;
 
+import java.util.function.Supplier;
+
 public final class Registration {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(SchematicEnergistics.MOD_ID);
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(SchematicEnergistics.MOD_ID);
@@ -39,7 +46,7 @@ public final class Registration {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<CannonInterfaceEntity>> CANNON_INTERFACE_ENTITY;
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, SchematicEnergistics.MOD_ID);
     public static DeferredItem<PartItem<CannonInterfacePart>> CANNON_INTERFACE_PART_ITEM;
-    public static final DeferredHolder<MenuType<?>, MenuType<CannonInterfaceMenu>> CANNON_INTERFACE_MENU;
+    public static final Supplier<MenuType<CannonInterfaceMenu>> CANNON_INTERFACE_MENU;
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
@@ -80,6 +87,9 @@ public final class Registration {
             return type;
         });
 
-        CANNON_INTERFACE_MENU = MENUS.register("cannon_interface", () -> IMenuTypeExtension.create(CannonInterfaceMenu::new));
+        CANNON_INTERFACE_MENU =
+                MENUS.register("cannon_interface", () ->
+                        MenuTypeBuilder.create(CannonInterfaceMenu::new, ICannonInterfaceHost.class)
+                                .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface")));
     }
 }

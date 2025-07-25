@@ -1,6 +1,9 @@
 package block;
 
 import appeng.block.AEBaseEntityBlock;
+import appeng.menu.MenuOpener;
+import appeng.menu.locator.MenuLocators;
+import appeng.util.InteractionUtil;
 import blockentity.CannonInterfaceEntity;
 import core.Registration;
 import net.minecraft.core.BlockPos;
@@ -27,12 +30,20 @@ public class CannonInterface extends AEBaseEntityBlock<CannonInterfaceEntity> {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof CannonInterfaceEntity cannonInterfaceEntity) {
-            if (!level.isClientSide()) {
-                ((ServerPlayer) player).openMenu(new SimpleMenuProvider(cannonInterfaceEntity, Component.literal("Cannon Interface")), pos);
-                return InteractionResult.SUCCESS;
-            }
+        if (InteractionUtil.isInAlternateUseMode(player)) {
+            return InteractionResult.PASS;
         }
-        return InteractionResult.SUCCESS;
+
+        var be = getBlockEntity(level, pos);
+
+        if (be != null) {
+            if (!level.isClientSide()) {
+                be.openMenu( player, MenuLocators.forBlockEntity(be));
+            }
+
+            return InteractionResult.sidedSuccess(level.isClientSide());
+        }
+
+        return InteractionResult.PASS;
     }
 }
