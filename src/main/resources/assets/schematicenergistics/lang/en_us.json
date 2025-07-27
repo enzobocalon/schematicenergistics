@@ -3,5 +3,7 @@
   "item.schematicenergistics.cannon_interface_part": "Cannon Interface",
   "block.schematicenergistics.cannon_interface.tooltip": "Allows the Schematic Cannon to interface with Applied Energistics 2 storage and autocraft.",
   "creativetab.schematicenergistics.title": "Schematic Energistics",
-  "gui.schematicenergistics.cannon_interface.title": "Cannon Interface"
+  "gui.schematicenergistics.cannon_interface.title": "Cannon Interface",
+  "gui.schematicenergistics.cannon_interface.no_item": "No Item",
+  "gui.schematicenergistics.cannon_interface.request_text": "Currently Requesting:"
 }

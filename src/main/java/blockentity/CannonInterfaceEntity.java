@@ -25,10 +25,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
+import part.CannonInterfacePart;
 
 public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGridTickable, ICraftingRequester, ICannonInterfaceHost {
     private @Nullable CannonInterfaceLogic cannonLogic = null;
     private final IActionSource actionSource;
+
+    private boolean gunpowderState = true; // default
+    private boolean craftingState = true;
 
     public CannonInterfaceEntity(BlockPos pos, BlockState state) {
         this(Registration.CANNON_INTERFACE_ENTITY.get(), pos, state);
@@ -44,10 +48,14 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
 
     public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag, registries);
+        tag.putBoolean("gunpowderState", this.gunpowderState);
+        tag.putBoolean("craftingState", this.craftingState);
     }
 
     public void loadTag(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadTag(tag, registries);
+        this.gunpowderState = tag.getBoolean("gunpowderState");
+        this.craftingState = tag.getBoolean("craftingState");
     }
 
     public void onReady() {
@@ -58,6 +66,7 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
     private EnumSet<Direction> getExposedSides() {
         return EnumSet.allOf(Direction.class);
     }
+
 
     @Override
     public void setLevel(Level level) {
@@ -74,6 +83,16 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
 
     public CannonInterfaceLogic getLogic() {
         return this.cannonLogic;
+    }
+
+    @Override
+    public @Nullable CannonInterfaceEntity getEntity() {
+        return this;
+    }
+
+    @Override
+    public @Nullable CannonInterfacePart getPart() {
+        return null;
     }
 
     public @Nullable IGridNode getGridNode() {
@@ -102,11 +121,34 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
 
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
+        System.out.println("gunpowder: " + this.gunpowderState + ", crafting: " + this.craftingState);
         return this.getLogic().tickingRequest(node, ticksSinceLastCall);
     }
 
     @Override
     public Component getDisplayName() {
         return Component.literal("Cannon Interface");
+    }
+
+    public void setConfigState(String type, boolean state) {
+        switch (type) {
+            case "gunpowderState":
+                this.gunpowderState = state;
+                break;
+            case "craftingState":
+                this.craftingState = state;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown config type: " + type);
+        }
+        this.setChanged();
+    }
+
+    public boolean getConfigState(String type) {
+        return switch (type) {
+            case "gunpowderState" -> this.gunpowderState;
+            case "craftingState" -> this.craftingState;
+            default -> throw new IllegalArgumentException("Unknown config type: " + type);
+        };
     }
 }

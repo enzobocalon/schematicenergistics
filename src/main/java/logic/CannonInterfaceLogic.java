@@ -25,14 +25,18 @@ import java.util.concurrent.ExecutionException;
 public class CannonInterfaceLogic {
     private final Level level;
     private final IManagedGridNode node;
+
     private final CraftingHelper craftingHelper;
     private final IActionSource actionSource;
     private final CraftingHelper gunpowderCraftingHelper;
+
     private ICraftingRequester requester;
+
     private AEItemKey item = AEItemKey.of(ItemStack.EMPTY);
+    private String schematicName = "";
 
-
-    public CannonInterfaceLogic(Level level, IManagedGridNode node, IActionSource actionSource, ICraftingRequester requester) {
+    public CannonInterfaceLogic(Level level, IManagedGridNode node, IActionSource actionSource,
+                                ICraftingRequester requester) {
         this.level = level;
         this.node = node;
         this.actionSource = actionSource;
@@ -114,7 +118,6 @@ public class CannonInterfaceLogic {
         return false;
     }
 
-
     public int refill(int amount) {
         if (node == null) return 0;
         var grid = node.getGrid();
@@ -134,7 +137,7 @@ public class CannonInterfaceLogic {
             this.gunpowderCraftingHelper.startCraft(gunpowderKey, amount, CalculationStrategy.CRAFT_LESS);
             return 0;
             // It will always return 0 when it requests a craft.
-            // The exact amount will be extracted in the next tick when the craft is done.
+            // The exact amount will be extracted in a next tick when the craft is done.
         } else {
             long extracted = inventory.extract(gunpowderKey, amount, Actionable.MODULATE, this.actionSource);
             return (int)extracted;
@@ -192,6 +195,15 @@ public class CannonInterfaceLogic {
             }
         }
     }
+
+    public void setSchematicName(String name) {
+        this.schematicName = name;
+    }
+
+    public String getSchematicName() {
+        return this.schematicName;
+    }
+
 
     public AEItemKey getItem() {
         return this.item;

@@ -4,12 +4,16 @@ import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;
 import appeng.api.stacks.AEItemKey;
 import blockentity.CannonInterfaceEntity;
+import com.simibubi.create.AllDataComponents;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonInventory;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import logic.CannonInterfaceLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -22,13 +26,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import part.CannonInterfacePart;
 
+import java.util.stream.Stream;
+
+import static java.lang.System.out;
+
 @Mixin({SchematicannonBlockEntity.class})
 public abstract class SchematicCannonMixin {
     @Shadow
     public SchematicannonInventory inventory;
-
-    @Shadow
-    public String statusMsg;
 
     private CannonInterfaceLogic cannonInterface;
 
@@ -90,6 +95,11 @@ public abstract class SchematicCannonMixin {
     )
     protected void tickPrinter(CallbackInfo ci) {
         if (this.cannonInterface == null) return;
+
+        var blueprint = inventory.getStackInSlot(0);
+        if (!blueprint.isEmpty()) {
+            this.cannonInterface.setSchematicName(blueprint.get(AllDataComponents.SCHEMATIC_FILE));
+        }
 
         int maxStackSize = this.inventory.getStackInSlot(4).getMaxStackSize();
         int currentAmountOnSlot = this.inventory.getStackInSlot(4).getCount();

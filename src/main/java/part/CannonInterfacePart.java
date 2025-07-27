@@ -19,6 +19,7 @@ import appeng.me.helpers.MachineSource;
 import appeng.menu.locator.MenuLocators;
 import appeng.parts.AEBasePart;
 import appeng.parts.PartModel;
+import blockentity.CannonInterfaceEntity;
 import com.google.common.collect.ImmutableSet;
 import com.schematicenergistics.SchematicEnergistics;
 import logic.CannonInterfaceLogic;
@@ -47,6 +48,14 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
     @PartModels
     private static final ResourceLocation MODEL_INTERFACE = SchematicEnergistics.makeId("part/cannon_interface");
 
+    public @Nullable CannonInterfaceEntity getEntity() {
+        return null;
+    }
+
+    @Override
+    public @Nullable CannonInterfacePart getPart() {
+        return this;
+    }
 
     @Override
     public void getBoxes(IPartCollisionHelper bch) {

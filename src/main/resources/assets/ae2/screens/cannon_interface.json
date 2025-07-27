@@ -13,6 +13,16 @@
         "left": 8,
         "top": 5
       }
+    },
+    "request_text": {
+      "text": {
+        "translate": "gui.schematicenergistics.cannon_interface.request_text"
+      },
+      "position": {
+        "left": 36,
+        "top": 25
+      },
+      "scale": 0.8
     }
   },
   "background": {
