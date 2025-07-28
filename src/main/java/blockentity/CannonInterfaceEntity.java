@@ -124,19 +124,15 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
 
     @Override
     public TickRateModulation tickingRequest(IGridNode node, int ticksSinceLastCall) {
-//        System.out.println("craftingState: " + this.craftingState);
-//        System.out.println("gunpowderState: " + this.gunpowderState);
-//        System.out.println("gunpowderCraftingState: " + this.gunpowderCraftingState);
         return this.getLogic().tickingRequest(node, ticksSinceLastCall);
     }
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("Cannon Interface");
+        return Component.translatable("gui.schematicenergistics.cannon_interface.title");
     }
 
     public void setConfigState(String type, boolean state) {
-        System.out.println(type);
         switch (type) {
             case "gunpowderState":
                 this.gunpowderState = state;

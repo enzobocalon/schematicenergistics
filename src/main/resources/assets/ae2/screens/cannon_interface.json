@@ -14,13 +14,23 @@
         "top": 5
       }
     },
-    "request_text": {
+    "schematic_text": {
       "text": {
-        "translate": "gui.schematicenergistics.cannon_interface.request_text"
+        "translate": "gui.schematicenergistics.cannon_interface.schematic_name"
       },
       "position": {
-        "left": 48,
-        "top": 25
+        "left": 12,
+        "top": 22
+      },
+      "scale": 0.8
+    },
+    "status_text": {
+      "text": {
+        "translate": "gui.schematicenergistics.cannon_interface.cannon_status"
+      },
+      "position": {
+        "left": 12,
+        "top": 32
       },
       "scale": 0.8
     }

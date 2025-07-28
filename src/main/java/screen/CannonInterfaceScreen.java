@@ -30,11 +30,6 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         super(menu, playerInventory, title, style);
         this.imageWidth = 176;
         this.imageHeight = 182;
-    }
-
-    @Override
-    protected void init() {
-        super.init();
 
         int centerX = this.leftPos + (this.imageWidth / 2) - 8;
 
@@ -59,7 +54,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         );
 
         this.toggleGunpowder = new SEToggleButton(
-                SEIcon.GUNPOWDER,
+                SEIcon.GUNPOWDER_ALLOW,
                 SEIcon.GUNPOWDER_DENY,
                 Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder"),
                 Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_hint"),
@@ -72,8 +67,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         );
 
         this.toggleGunpowderCrafting = new SEToggleButton(
-                SEIcon.GUNPOWDER_ALLOW,
-                SEIcon.GUNPOWDER_DENY,
+                SEIcon.GUNPOWDER_CRAFTING_ALLOW,
+                SEIcon.GUNPOWDER_CRAFTING_DENY,
                 Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting"),
                 Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting_hint"),
                 Component.translatable("gui.schematicenergistics.cannon_interface.enable_gunpowder_crafting"),
@@ -84,17 +79,15 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 gunpowderCraftingState
         );
 
+        this.addToLeftToolbar(toggleCrafting);
+        this.addToLeftToolbar(toggleGunpowder);
+        this.addToLeftToolbar(toggleGunpowderCrafting);
+    }
 
-//        this.toggleGunpowder.setPosition(centerX + 16,  this.topPos + 144 / 2 - 8);
-//        this.toggleCrafting.setPosition(centerX - 16,  this.topPos + 144 / 2 - 8);
-
-        this.toggleCrafting.setPosition(this.leftPos + this.imageWidth,  this.topPos);
-        this.toggleGunpowder.setPosition(this.leftPos + this.imageWidth,  this.topPos + 24);
-        this.toggleGunpowderCrafting.setPosition(this.leftPos + this.imageWidth,  this.topPos + 48);
-
-        this.addRenderableWidget(toggleCrafting);
-        this.addRenderableWidget(toggleGunpowder);
-        this.addRenderableWidget(toggleGunpowderCrafting);
+    @Override
+    protected void init() {
+        super.init();
+        updateSchematicName(null);
     }
 
     public void sendState(String config, boolean state) {
@@ -108,9 +101,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     @Override
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-
-        int centerX = this.leftPos + (this.imageWidth / 2) - 8;
-        int centerY = this.topPos + 98 / 2 - 8;
+        int centerX = this.leftPos + 147;
+        int centerY = this.topPos + 22;
 
         if (this.item != null && !this.item.toStack().isEmpty()) {
             guiGraphics.renderItem(this.item.toStack(), centerX, centerY);
@@ -140,9 +132,19 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         }
     }
 
+    public void updateSchematicName(String schematicName) {
+        this.schematicName = schematicName;
+
+        Component text = schematicName == null || schematicName.isEmpty() ?
+            Component.translatable("gui.schematicenergistics.cannon_interface.schematic_name")
+                : Component.literal(schematicName);
+
+        setTextContent("schematic_text", text);
+    }
+
     public void updateScreenItem(CompoundTag data, String schematicName) {
         var item = AEItemKey.fromTag(menu.getLogic().getLevel().registryAccess(), data);
         this.item = item != null ? item : AEItemKey.of(ItemStack.EMPTY);
-        this.schematicName = schematicName;
+        updateSchematicName(schematicName);
     }
 }
