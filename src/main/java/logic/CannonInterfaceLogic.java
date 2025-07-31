@@ -213,7 +213,6 @@ public class CannonInterfaceLogic {
     public void sendSchematicannonState(String state) {
         BlockEntity be = this.getLinkedCannon();
         if (be instanceof SchematicannonBlockEntity cannonEntity) {
-            System.out.println("sendSchematicannonState " + state);
             cannonEntity.state = SchematicannonBlockEntity.State.valueOf(state.toUpperCase());
             cannonEntity.setChanged();
         }

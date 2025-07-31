@@ -13,7 +13,8 @@ public enum SEIcon {
     GUNPOWDER_CRAFTING_ALLOW(80, 0),
     GUNPOWDER_CRAFTING_DENY(96, 0),
     PLAY(112, 0),
-    PAUSE(128, 0);
+    PAUSE(128, 0),
+    STOP(144, 0);
 
     public final int x;
     public final int y;
