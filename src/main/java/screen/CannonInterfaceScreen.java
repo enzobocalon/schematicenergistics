@@ -15,6 +15,7 @@ import network.PacketHandler;
 import network.payloads.CannonInterfaceConfigPacket;
 import network.payloads.CannonStatePacket;
 import widgets.SEIcon;
+import widgets.SESimpleIconButton;
 import widgets.SEToggleButton;
 
 public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
@@ -22,6 +23,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     private final SEToggleButton toggleGunpowderCrafting;
     private final SEToggleButton toggleCrafting;
     private final SEToggleButton toggleGunpowder;
+    private SESimpleIconButton stop;
     private SEToggleButton playPause;
 
     private boolean craftingState;
@@ -100,16 +102,30 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 Component.translatable("gui.schematicenergistics.cannon_interface.pause_hint"),
                 Component.translatable("gui.schematicenergistics.cannon_interface.play"),
                 Component.translatable("gui.schematicenergistics.cannon_interface.play_hint"),
-                this::sendCannonState,
+                (state) -> sendCannonState(state, false),
                 false
         );
 
         this.playPause.setPosition(
-                centerX,
+                centerX - 16,
                 this.topPos + 56
         );
 
         this.addRenderableWidget(playPause);
+
+        this.stop = new SESimpleIconButton(
+                SEIcon.STOP,
+                Component.translatable("gui.schematicenergistics.cannon_interface.stop"),
+                Component.translatable("gui.schematicenergistics.cannon_interface.stop_hint"),
+                (btn) -> sendCannonState(false, true)
+        );
+
+        this.stop.setPosition(
+                centerX + 16,
+                this.topPos + 56
+        );
+
+        this.addRenderableWidget(stop);
     }
 
     public void sendState(String config, boolean state) {
@@ -120,7 +136,15 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         );
     }
 
-    public void sendCannonState(boolean state) {
+    public void sendCannonState(boolean state, boolean isStop) {
+        if (isStop) {
+            var stoppedState = SchematicannonBlockEntity.State.STOPPED;
+            PacketHandler.sendToServer(
+                    new CannonStatePacket(stoppedState.toString())
+            );
+            return;
+        }
+
         this.playPause.setState(state);
         SchematicannonBlockEntity.State cannonState = state ? SchematicannonBlockEntity.State.RUNNING : SchematicannonBlockEntity.State.PAUSED;
 
