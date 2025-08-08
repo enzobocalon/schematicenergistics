@@ -1,39 +1,37 @@
 package menu;
 
-import core.Registration;
-import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import appeng.menu.AEBaseMenu;
+import lib.TerminalListData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.inventory.MenuType;
+import net.neoforged.neoforge.network.PacketDistributor;
+import network.payloads.TerminalListClientPacket;
+import org.jetbrains.annotations.Nullable;
+import part.CannonInterfaceTerminal;
 
-public class CannonInterfaceTerminalMenu extends AbstractContainerMenu {
-    private final BlockEntity blockEntity;
-    private final BlockPos pos;
-    private final Level level;
+import java.util.List;
 
-    public CannonInterfaceTerminalMenu(int containerId, Inventory playerInv, FriendlyByteBuf buf) {
-        this(containerId, playerInv, playerInv.player.level().getBlockEntity(buf.readBlockPos()));
-    }
+public class CannonInterfaceTerminalMenu extends AEBaseMenu {
+    private @Nullable CannonInterfaceTerminal terminal = null;
+    private List<TerminalListData> hosts;
 
-    public CannonInterfaceTerminalMenu(int containerId, Inventory playerInv, BlockEntity blockEntity) {
-        super(Registration.CANNON_INTERFACE_MENU.get(), containerId);
-        this.blockEntity = blockEntity;
-        this.pos = blockEntity.getBlockPos();
-        this.level = playerInv.player.level();
-    }
 
-    @Override
-    public ItemStack quickMoveStack(Player player, int i) {
-        return null;
+    public CannonInterfaceTerminalMenu(MenuType<?> menuType, int id, Inventory playerInventory, Object host) {
+        super(menuType, id, playerInventory, host);
+
+        if (host instanceof CannonInterfaceTerminal terminal) {
+            this.terminal = terminal;
+            this.hosts = this.terminal.getCannonInterfaces();
+        }
     }
 
     @Override
-    public boolean stillValid(Player player) {
-        if (this.blockEntity == null || blockEntity.isRemoved()) return false;
-        return player.distanceToSqr(pos.getCenter()) <= 64;
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        if (getPlayer() instanceof ServerPlayer player) {
+            PacketDistributor.sendToPlayer(player,
+                    new TerminalListClientPacket(hosts));
+        }
     }
 }

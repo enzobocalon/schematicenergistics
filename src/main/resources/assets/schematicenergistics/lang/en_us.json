@@ -25,5 +25,6 @@
   "gui.schematicenergistics.cannon_interface.pause_hint": "Pauses the Schematicannon.",
   "gui.schematicenergistics.cannon_interface.play_hint": "Starts or resumes the Schematic Cannon.",
   "gui.schematicenergistics.cannon_interface.stop": "Stop Cannon",
-  "gui.schematicenergistics.cannon_interface.stop_hint": "Stops the Schematic Cannon."
+  "gui.schematicenergistics.cannon_interface.stop_hint": "Stops the Schematic Cannon.",
+  "gui.schematicenergistics.cannon_terminal.title": "Cannon Interface Terminal"
 }

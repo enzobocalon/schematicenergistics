@@ -1,9 +1,11 @@
 package core;
 
 import appeng.api.AECapabilities;
+import appeng.api.implementations.parts.IMonitorPart;
 import appeng.api.networking.IInWorldGridNodeHost;
 import appeng.api.parts.IPart;
 import appeng.api.parts.PartModels;
+import appeng.api.storage.ITerminalHost;
 import appeng.block.AEBaseBlock;
 import appeng.blockentity.AEBaseBlockEntity;
 import appeng.items.parts.PartItem;
@@ -17,6 +19,7 @@ import com.schematicenergistics.SchematicEnergistics;
 import logic.CannonInterfaceLogic;
 import logic.ICannonInterfaceHost;
 import menu.CannonInterfaceMenu;
+import menu.CannonInterfaceTerminalMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuConstructor;
@@ -50,6 +53,7 @@ public final class Registration {
     public static DeferredItem<PartItem<CannonInterfacePart>> CANNON_INTERFACE_PART_ITEM;
     public static DeferredItem<PartItem<CannonInterfaceTerminal>> CANNON_TERMINAL;
     public static final Supplier<MenuType<CannonInterfaceMenu>> CANNON_INTERFACE_MENU;
+    public static final Supplier<MenuType<CannonInterfaceTerminalMenu>> CANNON_INTERFACE_TERMINAL_MENU;
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
@@ -103,5 +107,10 @@ public final class Registration {
                 MENUS.register("cannon_interface", () ->
                         MenuTypeBuilder.create(CannonInterfaceMenu::new, ICannonInterfaceHost.class)
                                 .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface")));
+
+        CANNON_INTERFACE_TERMINAL_MENU =
+                MENUS.register("cannon_interface_terminal", () ->
+                        MenuTypeBuilder.create(CannonInterfaceTerminalMenu::new, IMonitorPart.class)
+                                .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface_terminal")));
     }
 }

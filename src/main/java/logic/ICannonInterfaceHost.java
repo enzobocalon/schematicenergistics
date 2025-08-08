@@ -1,9 +1,11 @@
 package logic;
 
+import appeng.api.networking.IGridNodeService;
 import appeng.menu.MenuOpener;
 import appeng.menu.locator.MenuHostLocator;
 import blockentity.CannonInterfaceEntity;
 import core.Registration;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 import part.CannonInterfacePart;

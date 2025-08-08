@@ -4,10 +4,7 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.IPayloadHandler;
-import network.payloads.CannonInterfaceConfigClientPacket;
-import network.payloads.CannonInterfaceConfigPacket;
-import network.payloads.CannonInterfaceSyncPacket;
-import network.payloads.CannonStatePacket;
+import network.payloads.*;
 
 public class PacketHandler {
 
@@ -44,6 +41,12 @@ public class PacketHandler {
                 CannonStatePacket.TYPE,
                 CannonStatePacket.STREAM_CODEC,
                 handler(CannonStatePacket::handle)
+        );
+
+        registrar.playToClient(
+                TerminalListClientPacket.TYPE,
+                TerminalListClientPacket.STREAM_CODEC,
+                handler(TerminalListClientPacket::handle)
         );
     }
 

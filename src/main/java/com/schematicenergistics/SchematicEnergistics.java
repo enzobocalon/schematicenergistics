@@ -25,6 +25,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
 import network.PacketHandler;
 import screen.CannonInterfaceScreen;
+import screen.CannonInterfaceTerminalScreen;
 import tab.CreativeTab;
 
 @Mod(SchematicEnergistics.MOD_ID)
@@ -60,6 +61,13 @@ public class SchematicEnergistics {
                 Registration.CANNON_INTERFACE_MENU.get(),
                 CannonInterfaceScreen::new,
                 "/screens/cannon_interface.json"
+        );
+
+        InitScreens.register(
+                event,
+                Registration.CANNON_INTERFACE_TERMINAL_MENU.get(),
+                CannonInterfaceTerminalScreen::new,
+                "/screens/cannon_interface_terminal.json"
         );
     }
 

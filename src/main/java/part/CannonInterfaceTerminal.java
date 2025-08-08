@@ -1,16 +1,34 @@
 package part;
 
+import appeng.api.networking.IGrid;
+import appeng.api.networking.IGridNode;
+import appeng.api.networking.IInWorldGridNodeHost;
 import appeng.api.parts.IPartCollisionHelper;
 import appeng.api.parts.IPartItem;
 import appeng.api.parts.IPartModel;
+import appeng.api.storage.IPatternAccessTermMenuHost;
+import appeng.api.storage.ITerminalHost;
 import appeng.api.util.AEColor;
 import appeng.core.AppEng;
 import appeng.items.parts.PartModels;
-import appeng.parts.AEBasePart;
+import appeng.menu.MenuOpener;
+import appeng.menu.locator.MenuLocators;
 import appeng.parts.PartModel;
 import appeng.parts.reporting.AbstractDisplayPart;
+import blockentity.CannonInterfaceEntity;
 import com.schematicenergistics.SchematicEnergistics;
+import core.Registration;
+import lib.SEUtils;
+import lib.TerminalListData;
+import logic.ICannonInterfaceHost;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class CannonInterfaceTerminal extends AbstractDisplayPart {
 
@@ -29,6 +47,7 @@ public class CannonInterfaceTerminal extends AbstractDisplayPart {
 
     public CannonInterfaceTerminal(IPartItem<?> partItem, boolean requireChannel) {
         super(partItem, requireChannel);
+
     }
 
     @Override
@@ -36,4 +55,53 @@ public class CannonInterfaceTerminal extends AbstractDisplayPart {
         return this.selectModel(MODELS_OFF, MODELS_ON, MODELS_HAS_CHANNEL);
     }
 
+    @Override
+    public boolean onUseWithoutItem(Player player, Vec3 pos) {
+        if (!player.getCommandSenderWorld().isClientSide()) {
+            MenuOpener.open(Registration.CANNON_INTERFACE_TERMINAL_MENU.get(), player, MenuLocators.forPart(this));
+        }
+        getCannonInterfaces();
+        return true;
+    }
+
+    public List<TerminalListData> getCannonInterfaces() {
+        List<TerminalListData> result = new ArrayList<>();
+
+        IGridNode node = this.getMainNode().getNode();
+        if (node == null) {
+            return result;
+        }
+
+        IGrid grid = node.getGrid();
+        if (grid == null) {
+            return result;
+        }
+
+        var entities = grid.getMachines(CannonInterfaceEntity.class);
+        var parts = grid.getMachines(CannonInterfacePart.class);
+
+        for (var entity : entities) {
+            if (entity != null) {
+                var schematicName = entity.getLogic().getSchematicName();
+                if (schematicName == null || schematicName.isEmpty()) {
+                    schematicName = "";
+                }
+                TerminalListData data = new TerminalListData(entity.getBlockPos(), schematicName, SEUtils.InterfaceType.BLOCK);
+                result.add(data);
+            }
+        }
+
+        for (var part : parts) {
+            if (part != null) {
+                var schematicName = part.getLogic().getSchematicName();
+                if (schematicName == null || schematicName.isEmpty()) {
+                    schematicName = "";
+                }
+                TerminalListData data = new TerminalListData(part.getBlockEntity().getBlockPos(), schematicName, SEUtils.InterfaceType.PART);
+                result.add(data);
+            }
+        }
+
+        return result;
+    }
 }

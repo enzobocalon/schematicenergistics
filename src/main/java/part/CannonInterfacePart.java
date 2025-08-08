@@ -24,6 +24,7 @@ import com.google.common.collect.ImmutableSet;
 import com.schematicenergistics.SchematicEnergistics;
 import logic.CannonInterfaceLogic;
 import logic.ICannonInterfaceHost;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

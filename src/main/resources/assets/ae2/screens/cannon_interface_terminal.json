@@ -1,0 +1,44 @@
+{
+  "$schema": "schema.json",
+  "includes": [
+    "common/common.json"
+  ],
+  "background": {
+    "texture": "guis/cannon_selector.png",
+    "srcRect": [0, 0, 128, 164]
+  },
+  "widgets": {
+    "scrollbar": {
+      "left": 114,
+      "top": 20,
+      "width": 12,
+      "height": 137
+    }
+  },
+  "text": {
+    "dialog_title": {
+        "text": {
+            "translate": "gui.schematicenergistics.cannon_terminal.title"
+        },
+        "scale": 0.8,
+        "position": {
+            "left": 8,
+            "top": 5
+        }
+    }
+  },
+  "images": {
+    "cannonListButton": {
+      "texture": "guis/cannon_selector.png",
+      "textureWidth": 256,
+      "textureHeight": 256,
+      "srcRect": [130, 0, 104, 22]
+    },
+    "cannonListButtonSelected": {
+      "texture": "guis/cannon_selector.png",
+      "textureWidth": 256,
+      "textureHeight": 256,
+      "srcRect": [130, 22, 104, 22]
+    }
+  }
+}

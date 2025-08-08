@@ -1,9 +1,7 @@
 package screen;
 import appeng.api.stacks.AEItemKey;
 import appeng.client.gui.AEBaseScreen;
-import appeng.client.gui.Icon;
 import appeng.client.gui.style.ScreenStyle;
-import appeng.client.gui.widgets.ToggleButton;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import lib.CannonInterfaceClientState;
 import lib.SEUtils;
@@ -31,7 +29,6 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     private boolean craftingState;
     private boolean gunpowderState;
     private boolean gunpowderCraftingState;
-
 
     public CannonInterfaceScreen(CannonInterfaceMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
