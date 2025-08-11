@@ -7,10 +7,14 @@ import appeng.client.gui.widgets.Scrollbar;
 import lib.TerminalListData;
 import logic.ICannonInterfaceHost;
 import menu.CannonInterfaceTerminalMenu;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.neoforged.neoforge.network.PacketDistributor;
+import network.payloads.OpenCannonInterfacePacket;
 import widgets.SETerminalButton;
 
 import java.util.ArrayList;
@@ -33,6 +37,8 @@ public class CannonInterfaceTerminalScreen extends AEBaseScreen<CannonInterfaceT
     private final List<SETerminalButton> cannonButtons = new ArrayList<>();
     private List<TerminalListData> data = new ArrayList<>();
     private int selectedIndex = -1;
+
+    private BlockPos terminalPos = BlockPos.ZERO;
 
     public CannonInterfaceTerminalScreen(CannonInterfaceTerminalMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
         super(menu, playerInventory, title, style);
@@ -118,8 +124,11 @@ public class CannonInterfaceTerminalScreen extends AEBaseScreen<CannonInterfaceT
         selectedIndex = itemIndex;
         TerminalListData selectedCannon = data.get(itemIndex);
 
-        System.out.println("clicou no terminal: " + itemIndex);
         updateButtonsContent();
+
+        PacketDistributor.sendToServer(
+                new OpenCannonInterfacePacket(selectedCannon.cannonPos(), terminalPos)
+        );
     }
 
     @Override
@@ -134,16 +143,15 @@ public class CannonInterfaceTerminalScreen extends AEBaseScreen<CannonInterfaceT
         updateButtonsContent();
     }
 
-    public void receiveData(List<TerminalListData> newData) {
+    public void receiveData(List<TerminalListData> newData, BlockPos terminalPos) {
         this.data = newData != null ? new ArrayList<>(newData) : new ArrayList<>();
 
         if (selectedIndex >= this.data.size()) {
             selectedIndex = -1;
         }
 
+        this.terminalPos = terminalPos;
         updateScrollbar();
         updateButtonsContent();
-
-        System.out.println("Dados recebidos: " + this.data.size() + " terminais");
     }
 }

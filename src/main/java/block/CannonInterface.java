@@ -34,6 +34,9 @@ public class CannonInterface extends AEBaseEntityBlock<CannonInterfaceEntity> {
 
         if (be != null) {
             if (!level.isClientSide()) {
+                if (be.getLogic() != null) {
+                    be.getLogic().setTerminalPos(null);
+                }
                 be.openMenu( player, MenuLocators.forBlockEntity(be));
             }
 

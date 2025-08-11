@@ -1,7 +1,6 @@
 package menu;
 
 import appeng.menu.AEBaseMenu;
-import lib.TerminalListData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
@@ -10,11 +9,8 @@ import network.payloads.TerminalListClientPacket;
 import org.jetbrains.annotations.Nullable;
 import part.CannonInterfaceTerminal;
 
-import java.util.List;
-
 public class CannonInterfaceTerminalMenu extends AEBaseMenu {
     private @Nullable CannonInterfaceTerminal terminal = null;
-    private List<TerminalListData> hosts;
 
 
     public CannonInterfaceTerminalMenu(MenuType<?> menuType, int id, Inventory playerInventory, Object host) {
@@ -22,16 +18,16 @@ public class CannonInterfaceTerminalMenu extends AEBaseMenu {
 
         if (host instanceof CannonInterfaceTerminal terminal) {
             this.terminal = terminal;
-            this.hosts = this.terminal.getCannonInterfaces();
         }
     }
 
     @Override
     public void broadcastChanges() {
         super.broadcastChanges();
+        if (this.terminal == null) return;
         if (getPlayer() instanceof ServerPlayer player) {
             PacketDistributor.sendToPlayer(player,
-                    new TerminalListClientPacket(hosts));
+                    new TerminalListClientPacket(this.terminal.getCannonInterfaces(), terminal.getBlockEntity().getBlockPos()));
         }
     }
 }

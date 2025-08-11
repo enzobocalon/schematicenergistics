@@ -60,7 +60,6 @@ public class CannonInterfaceTerminal extends AbstractDisplayPart {
         if (!player.getCommandSenderWorld().isClientSide()) {
             MenuOpener.open(Registration.CANNON_INTERFACE_TERMINAL_MENU.get(), player, MenuLocators.forPart(this));
         }
-        getCannonInterfaces();
         return true;
     }
 
@@ -79,14 +78,23 @@ public class CannonInterfaceTerminal extends AbstractDisplayPart {
 
         var entities = grid.getMachines(CannonInterfaceEntity.class);
         var parts = grid.getMachines(CannonInterfacePart.class);
-
+        var dimension = getLevel().dimension().location().toString().split(":")[1];
         for (var entity : entities) {
             if (entity != null) {
                 var schematicName = entity.getLogic().getSchematicName();
+                var status = entity.getLogic().getStatusMsg();
                 if (schematicName == null || schematicName.isEmpty()) {
                     schematicName = "";
                 }
-                TerminalListData data = new TerminalListData(entity.getBlockPos(), schematicName, SEUtils.InterfaceType.BLOCK);
+
+                TerminalListData data = new TerminalListData(
+                        entity.getBlockPos(),
+                        schematicName,
+                        SEUtils.InterfaceType.BLOCK,
+                        dimension,
+                        status,
+                        entity.getLogic().getState()
+                );
                 result.add(data);
             }
         }
@@ -94,10 +102,20 @@ public class CannonInterfaceTerminal extends AbstractDisplayPart {
         for (var part : parts) {
             if (part != null) {
                 var schematicName = part.getLogic().getSchematicName();
+                var status = part.getLogic().getStatusMsg();
                 if (schematicName == null || schematicName.isEmpty()) {
                     schematicName = "";
                 }
-                TerminalListData data = new TerminalListData(part.getBlockEntity().getBlockPos(), schematicName, SEUtils.InterfaceType.PART);
+
+                TerminalListData data = new TerminalListData(
+                        part.getBlockEntity().getBlockPos(),
+                        schematicName,
+                        SEUtils.InterfaceType.PART,
+                        dimension,
+                        status,
+                        part.getLogic().getState()
+                );
+
                 result.add(data);
             }
         }

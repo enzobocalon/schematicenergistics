@@ -16,6 +16,7 @@ import appeng.api.storage.MEStorage;
 import com.google.common.collect.ImmutableSet;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import lib.CraftingHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
@@ -43,6 +44,8 @@ public class CannonInterfaceLogic {
     private boolean gunpowderCraftingState = true;
     private boolean craftingState = true;
     private boolean gunpowderState = true;
+
+    private BlockPos terminalPos = null;
 
     private SchematicannonBlockEntity cannonEntity;
 
@@ -127,6 +130,14 @@ public class CannonInterfaceLogic {
         }
 
         return false;
+    }
+
+    public void setTerminalPos(BlockPos pos) {
+        this.terminalPos = pos;
+    }
+
+    public BlockPos getTerminalPos() {
+        return this.terminalPos;
     }
 
     public int refill(int amount) {

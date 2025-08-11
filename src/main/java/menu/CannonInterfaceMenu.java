@@ -125,22 +125,44 @@ public class CannonInterfaceMenu extends AEBaseMenu {
             this.clientItem = getLogic().getItem();
 
             // Send the CannonInterfaceSyncPacket to the player
-            PacketDistributor.sendToPlayer(player,
-                    new CannonInterfaceSyncPacket(
-                            clientItem != null && !clientItem.toStack().isEmpty()
-                                    ? clientItem.toTag(getLogic().getLevel().registryAccess())
-                                    : new CompoundTag(),
-                            getLogic().getSchematicName() != null && !getLogic().getSchematicName().isEmpty()
-                                    ? getLogic().getSchematicName()
-                                    : "",
-                            getLogic().getStatusMsg() != null && !getLogic().getStatusMsg().isEmpty()
-                                    ? getLogic().getStatusMsg()
-                                    : "",
-                            getLogic().getState() != null && !getLogic().getState().isEmpty()
-                                    ? getLogic().getState()
-                                    : ""
-                    )
-            );
+
+            var item = clientItem != null && !clientItem.toStack().isEmpty()
+                    ? clientItem.toTag(getLogic().getLevel().registryAccess())
+                    : new CompoundTag();
+
+            var name = getLogic().getSchematicName() != null && !getLogic().getSchematicName().isEmpty()
+                    ? getLogic().getSchematicName()
+                    : "";
+
+            var statusMsg = getLogic().getStatusMsg() != null && !getLogic().getStatusMsg().isEmpty()
+                    ? getLogic().getStatusMsg()
+                    : "";
+
+            var state = getLogic().getState() != null && !getLogic().getState().isEmpty()
+                    ? getLogic().getState()
+                    : "";
+
+            var terminal = getLogic().getTerminalPos();
+
+            if (terminal != null) {
+                PacketDistributor.sendToPlayer(player,
+                        new CannonInterfaceSyncPacket(
+                                item,
+                                name,
+                                statusMsg,
+                                state,
+                                terminal
+                        ));
+            } else {
+                PacketDistributor.sendToPlayer(player,
+                        new CannonInterfaceSyncPacket(
+                                item,
+                                name,
+                                statusMsg,
+                                state
+                        ));
+            }
+
         }
     }
 

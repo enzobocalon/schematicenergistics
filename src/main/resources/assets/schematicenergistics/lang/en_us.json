@@ -19,12 +19,13 @@
   "gui.schematicenergistics.cannon_interface.disable_gunpowder_hint": "Disables the cannon from requesting gunpowder. This will also stop the cannon from crafting gunpowder.",
   "gui.schematicenergistics.cannon_interface.enable_gunpowder_hint": "Enables the cannon to request gunpowder. Crafting is toggled separately.",
   "gui.schematicenergistics.cannon_interface.schematic_name": "No Schematic Found",
-  "gui.schematicenergistics.cannon_interface.cannon_status": "Status: Fetching...",
+  "gui.schematicenergistics.cannon_interface.missing_cannon": "Cannon Missing",
   "gui.schematicenergistics.cannon_interface.pause": "Pause Cannon",
   "gui.schematicenergistics.cannon_interface.play": "Start/Resume Cannon",
   "gui.schematicenergistics.cannon_interface.pause_hint": "Pauses the Schematicannon.",
   "gui.schematicenergistics.cannon_interface.play_hint": "Starts or resumes the Schematic Cannon.",
   "gui.schematicenergistics.cannon_interface.stop": "Stop Cannon",
   "gui.schematicenergistics.cannon_interface.stop_hint": "Stops the Schematic Cannon.",
-  "gui.schematicenergistics.cannon_terminal.title": "Cannon Interface Terminal"
+  "gui.schematicenergistics.cannon_terminal.title": "Cannon Interface Terminal",
+  "gui.schematicenergistics.cannon_terminal.return_terminal": "Return to Terminal"
 }

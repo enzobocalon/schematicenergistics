@@ -48,6 +48,18 @@ public class PacketHandler {
                 TerminalListClientPacket.STREAM_CODEC,
                 handler(TerminalListClientPacket::handle)
         );
+
+        registrar.playToServer(
+                OpenCannonInterfacePacket.TYPE,
+                OpenCannonInterfacePacket.STREAM_CODEC,
+                handler(OpenCannonInterfacePacket::handle)
+        );
+
+        registrar.playToServer(
+                ReturnToTerminalPacket.TYPE,
+                ReturnToTerminalPacket.STREAM_CODEC,
+                handler(ReturnToTerminalPacket::handle)
+        );
     }
 
     private static <T extends CustomPacketPayload> IPayloadHandler<T> handler(IPayloadHandler<T> handler) {
