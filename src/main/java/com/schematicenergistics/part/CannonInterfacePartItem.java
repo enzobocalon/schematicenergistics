@@ -19,7 +19,7 @@ public class CannonInterfacePartItem extends PartItem<CannonInterfacePart> {
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
-        tooltipComponents.add(Component.translatable("com.schematicenergistics.block.schematicenergistics.cannon_interface.tooltip")
+        tooltipComponents.add(Component.translatable("block.schematicenergistics.cannon_interface.tooltip")
                 .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC)
         );
     }

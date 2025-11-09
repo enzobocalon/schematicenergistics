@@ -52,10 +52,10 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         this.toggleCrafting = new SEToggleButton(
                 SEIcon.CRAFTING_ALLOW,
                 SEIcon.CRAFTING_DENY,
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting_hint"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_gunpowder_crafting"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_gunpowder_crafting_hint"),
+                Component.translatable("gui.schematicenergistics.cannon_interface.disable_autocraft"),
+                Component.translatable("gui.schematicenergistics.cannon_interface.disable_autocraft_hint"),
+                Component.translatable("gui.schematicenergistics.cannon_interface.enable_autocraft"),
+                Component.translatable("gui.schematicenergistics.cannon_interface.enable_autocraft_hint"),
                 state -> {
                     sendState("craftingState", state);
                 },

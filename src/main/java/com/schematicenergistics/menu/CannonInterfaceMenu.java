@@ -70,7 +70,7 @@ public class CannonInterfaceMenu extends AEBaseMenu {
             part.getHost().markForSave();
             sendState();
         } else {
-            throw new IllegalStateException("Both entity and com.schematicenergistics.part are null or not null in CannonInterfaceMenu");
+            throw new IllegalStateException("Both entity and part are null or not null in CannonInterfaceMenu");
         }
     }
 
