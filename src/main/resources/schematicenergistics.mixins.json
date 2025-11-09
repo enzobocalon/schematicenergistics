@@ -3,7 +3,8 @@
   "package": "com.schematicenergistics.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "SchematicCannonMixin"
+    "SchematicCannonMixin",
+    "MaterialChecklistMixin"
   ],
   "client": [],
   "injectors": {

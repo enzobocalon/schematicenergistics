@@ -3,7 +3,7 @@
 
 ## About
 
-A Minecraft mod that adds a new block allowing Create's Schematicannon to interact with AE2 storage and autocrafting.
+A Minecraft mod that adds a new com.schematicenergistics.block allowing Create's Schematicannon to interact with AE2 storage and autocrafting.
 - Available for Forge 1.20.1 and Neoforge 1.21;
 - Requires Create and AE2;
 - Supports both Create 0.5 and Create 6;

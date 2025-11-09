@@ -6,23 +6,23 @@ item_ids:
 
 # Cannon Interface
 
-A block that allows the Schematic Cannon from Create mod to connect to AE2 storage and autocraft.
+A com.schematicenergistics.block that allows the Schematic Cannon from Create mod to connect to AE2 storage and autocraft.
 
 <GameScene zoom="2" background="transparent" interactive={false}>
     <Block id="schematicenergistics:cannon_interface" />
 </GameScene>
 
 ## Usage
-Place it next to a Schematic Cannon and connect it to an AE2 network. It will allow the cannon to access items from the network.
+Place it next to a Schematic Cannon and connect it to an AE2 com.schematicenergistics.network. It will allow the cannon to access items from the com.schematicenergistics.network.
 Only one Cannon Interface can be connected to a Schematic Cannon at a time.
 
 <GameScene zoom="2" background="transparent" interactive={true}>
   <ImportStructure src="./structure/example.nbt"></ImportStructure>
 </GameScene>
 
-The Cannon will ALWAYS prioritize items from other inventories before accessing the AE2 network. This means that items from chest, barrels, etc, will be used first.
+The Cannon will ALWAYS prioritize items from other inventories before accessing the AE2 com.schematicenergistics.network. This means that items from chest, barrels, etc, will be used first.
 
-The Cannon Interface will also export gunpowder from the AE2 network to the Schematic Cannon, if it is connected to the network.
+The Cannon Interface will also export gunpowder from the AE2 com.schematicenergistics.network to the Schematic Cannon, if it is connected to the com.schematicenergistics.network.
 
 Right click it to open the GUI. You can now control the craft and export of items and gunpowder, as well as see the status of the connected Schematic Cannon.
 

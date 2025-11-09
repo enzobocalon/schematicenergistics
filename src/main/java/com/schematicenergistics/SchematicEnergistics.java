@@ -1,6 +1,6 @@
 package com.schematicenergistics;
 
-import core.Registration;
+import com.schematicenergistics.core.Registration;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -11,8 +11,8 @@ import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
-import network.PacketHandler;
-import tab.CreativeTab;
+import com.schematicenergistics.network.PacketHandler;
+import com.schematicenergistics.tab.CreativeTab;
 
 @Mod(SchematicEnergistics.MOD_ID)
 public class SchematicEnergistics {

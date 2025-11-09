@@ -1,3 +1,3 @@
-// 1.21.1	2025-06-02T23:34:36.9392983	Tags for minecraft:block mod id schematicenergistics
-a45bd25fcb7eb12ed869077a7bd09881c2cb80bd data/minecraft/tags/block/mineable/pickaxe.json
-a45bd25fcb7eb12ed869077a7bd09881c2cb80bd data/minecraft/tags/block/needs_stone_tool.json
+// 1.21.1	2025-06-02T23:34:36.9392983	Tags for minecraft:com.schematicenergistics.block mod id schematicenergistics
+a45bd25fcb7eb12ed869077a7bd09881c2cb80bd data/minecraft/tags/com.schematicenergistics.block/mineable/pickaxe.json
+a45bd25fcb7eb12ed869077a7bd09881c2cb80bd data/minecraft/tags/com.schematicenergistics.block/needs_stone_tool.json
