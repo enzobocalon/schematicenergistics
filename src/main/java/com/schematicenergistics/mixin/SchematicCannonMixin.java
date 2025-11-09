@@ -3,11 +3,11 @@ package com.schematicenergistics.mixin;
 import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;
 import appeng.api.stacks.AEItemKey;
-import blockentity.CannonInterfaceEntity;
+import com.schematicenergistics.blockentity.CannonInterfaceEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonInventory;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
-import logic.CannonInterfaceLogic;
+import com.schematicenergistics.logic.CannonInterfaceLogic;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -20,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
-import part.CannonInterfacePart;
+import com.schematicenergistics.part.CannonInterfacePart;
 
 @Mixin({SchematicannonBlockEntity.class})
 public abstract class SchematicCannonMixin {

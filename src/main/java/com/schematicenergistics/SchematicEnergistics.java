@@ -1,14 +1,11 @@
 package com.schematicenergistics;
 
-import appeng.api.ids.AECreativeTabIds;
 import appeng.api.util.AEColor;
 import appeng.client.render.StaticItemColor;
 import appeng.init.client.InitScreens;
-import core.Registration;
+import com.schematicenergistics.core.Registration;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
-import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -22,9 +19,9 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import screen.CannonInterfaceScreen;
-import screen.CannonInterfaceTerminalScreen;
-import tab.CreativeTab;
+import com.schematicenergistics.screen.CannonInterfaceScreen;
+import com.schematicenergistics.screen.CannonInterfaceTerminalScreen;
+import com.schematicenergistics.tab.CreativeTab;
 
 @Mod(SchematicEnergistics.MOD_ID)
 public class SchematicEnergistics {
