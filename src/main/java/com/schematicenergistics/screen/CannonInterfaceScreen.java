@@ -1,4 +1,5 @@
 package com.schematicenergistics.screen;
+
 import appeng.api.stacks.AEItemKey;
 import appeng.client.gui.AEBaseScreen;
 import appeng.client.gui.style.ScreenStyle;
@@ -36,7 +37,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
 
     private BlockPos terminal = null;
 
-    public CannonInterfaceScreen(CannonInterfaceMenu menu, Inventory playerInventory, Component title, ScreenStyle style) {
+    public CannonInterfaceScreen(CannonInterfaceMenu menu, Inventory playerInventory, Component title,
+            ScreenStyle style) {
         super(menu, playerInventory, title, style);
         this.imageWidth = 176;
         this.imageHeight = 182;
@@ -59,8 +61,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 state -> {
                     sendState("craftingState", state);
                 },
-                craftingState
-        );
+                craftingState);
 
         this.toggleGunpowder = new SEToggleButton(
                 SEIcon.GUNPOWDER_ALLOW,
@@ -72,8 +73,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 state -> {
                     sendState("gunpowderState", state);
                 },
-                gunpowderState
-        );
+                gunpowderState);
 
         this.toggleGunpowderCrafting = new SEToggleButton(
                 SEIcon.GUNPOWDER_CRAFTING_ALLOW,
@@ -85,8 +85,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 state -> {
                     sendState("gunpowderCraftingState", state);
                 },
-                gunpowderCraftingState
-        );
+                gunpowderCraftingState);
 
         this.addToLeftToolbar(toggleCrafting);
         this.addToLeftToolbar(toggleGunpowder);
@@ -109,14 +108,11 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 Component.translatable("gui.schematicenergistics.cannon_interface.play"),
                 Component.translatable("gui.schematicenergistics.cannon_interface.play_hint"),
                 (state) -> sendCannonState(state, false),
-                false
-        );
-
+                false);
 
         this.playPause.setPosition(
                 centerX - 16,
-                this.topPos + 56
-        );
+                this.topPos + 56);
 
         this.addRenderableWidget(playPause);
 
@@ -128,7 +124,6 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 (btn) -> sendCannonState(false, true) // Stop the cannon
         );
 
-
         stop.setPosition(centerX + 16, this.topPos + 56);
         this.addRenderableWidget(stop);
 
@@ -138,8 +133,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 Component.empty(),
                 (btn) -> {
                     PacketDistributor.sendToServer(new ReturnToTerminalPacket(terminal));
-                }
-        );
+                });
 
         backButton.setPosition(leftPos + imageWidth - 28, this.topPos - 10);
         backButton.visible = (terminal != null);
@@ -149,26 +143,23 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     public void sendState(String config, boolean state) {
         PacketDistributor.sendToServer(
                 new CannonInterfaceConfigPacket(
-                        state, config
-                )
-        );
+                        state, config));
     }
 
     public void sendCannonState(boolean state, boolean isStop) {
         if (isStop) {
             var stoppedState = SchematicannonBlockEntity.State.STOPPED;
             PacketDistributor.sendToServer(
-                    new CannonStatePacket(stoppedState.toString())
-            );
+                    new CannonStatePacket(stoppedState.toString()));
             return;
         }
 
         this.playPause.setState(state);
-        SchematicannonBlockEntity.State cannonState = state ? SchematicannonBlockEntity.State.RUNNING : SchematicannonBlockEntity.State.PAUSED;
+        SchematicannonBlockEntity.State cannonState = state ? SchematicannonBlockEntity.State.RUNNING
+                : SchematicannonBlockEntity.State.PAUSED;
 
         PacketDistributor.sendToServer(
-                new CannonStatePacket(cannonState.toString())
-        );
+                new CannonStatePacket(cannonState.toString()));
     }
 
     @Override
@@ -183,7 +174,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
 
         if (mouseX >= centerX && mouseX < centerX + 16 && mouseY >= centerY && mouseY < centerY + 16) {
             if (this.item == null || this.item.toStack().isEmpty()) {
-                guiGraphics.renderTooltip(this.font, Component.translatable("gui.schematicenergistics.cannon_interface.no_item"), mouseX, mouseY);
+                guiGraphics.renderTooltip(this.font,
+                        Component.translatable("gui.schematicenergistics.cannon_interface.no_item"), mouseX, mouseY);
             } else {
                 guiGraphics.renderTooltip(this.font, this.item.getDisplayName(), mouseX, mouseY);
             }
@@ -223,8 +215,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
 
     public void updateSchematicName(String schematicName) {
 
-        Component text = schematicName == null || schematicName.isEmpty() ?
-                Component.translatable("gui.schematicenergistics.cannon_interface.schematic_name")
+        Component text = schematicName == null || schematicName.isEmpty()
+                ? Component.translatable("gui.schematicenergistics.cannon_interface.schematic_name")
                 : Component.literal(schematicName);
 
         Component limitedText = limitTextWidth(text, MAX_TEXT_WIDTH);
@@ -232,8 +224,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     }
 
     public void updateStatusMsg(String statusMsg) {
-        Component text = statusMsg == null || statusMsg.isEmpty() ?
-                Component.translatable("gui.schematicenergistics.cannon_interface.missing_cannon")
+        Component text = statusMsg == null || statusMsg.isEmpty()
+                ? Component.translatable("gui.schematicenergistics.cannon_interface.missing_cannon")
                 : SEUtils.formatCannonStatus(statusMsg);
 
         Component limitedText = limitTextWidth(text, MAX_TEXT_WIDTH);
@@ -245,7 +237,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         this.playPause.setState(cState);
     }
 
-    public void updateScreenItem(CompoundTag data, String schematicName, String statusMsg, String state, BlockPos terminalPos) {
+    public void updateScreenItem(CompoundTag data, String schematicName, String statusMsg, String state,
+            BlockPos terminalPos) {
         var item = AEItemKey.fromTag(menu.getLogic().getLevel().registryAccess(), data);
         this.item = item != null ? item : AEItemKey.of(ItemStack.EMPTY);
 
