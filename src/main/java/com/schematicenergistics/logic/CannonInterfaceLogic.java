@@ -47,6 +47,7 @@ public class CannonInterfaceLogic {
     private String statusMsg = "";
     private String state = "";
 
+    private boolean bulkCraftState = false;
     private boolean gunpowderCraftingState = true;
     private boolean craftingState = true;
     private boolean gunpowderState = true;
@@ -223,7 +224,9 @@ public class CannonInterfaceLogic {
             processingPending(gunpowderCraftingHelper);
         }
 
-        processPreCrafting();
+        if (bulkCraftState) {
+            processPreCrafting();
+        }
 
         return TickRateModulation.FASTER;
     }
@@ -368,19 +371,25 @@ public class CannonInterfaceLogic {
 
     public void setState(String state) {
         this.state = state;
-        if ("STOPPED".equals(state)) {
-            this.hasPreCrafted = false;
-            this.isPreCrafting = false;
-            this.pendingCraftingJobs.clear();
-        }
-
-        if ("RUNNING".equals(state) && !hasPreCrafted && !isPreCrafting) {
-            if (startPreCrafting()) {
-                sendSchematicannonState("PAUSED");
-                this.state = "PAUSED";
-            } else {
-                hasPreCrafted = true;
+        if (bulkCraftState) {
+            if (isPreCrafting) {
+                setStatusMsg("BULK_CRAFTING");
             }
+            if ("STOPPED".equals(state)) {
+                this.hasPreCrafted = false;
+                this.isPreCrafting = false;
+                this.pendingCraftingJobs.clear();
+            }
+
+            if ("RUNNING".equals(state) && !hasPreCrafted && !isPreCrafting) {
+                if (startPreCrafting()) {
+                    sendSchematicannonState("PAUSED");
+                    this.state = "PAUSED";
+                } else {
+                    hasPreCrafted = true;
+                }
+            }
+
         }
     }
 
@@ -573,5 +582,13 @@ public class CannonInterfaceLogic {
 
     public boolean getGunpowderCraftingState() {
         return this.gunpowderCraftingState;
+    }
+
+    public void setBulkCraftState(boolean state) {
+        this.bulkCraftState = state;
+    }
+
+    public boolean getBulkCraftState(boolean state) {
+        return this.bulkCraftState;
     }
 }

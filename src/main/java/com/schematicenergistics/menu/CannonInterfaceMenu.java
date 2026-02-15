@@ -46,11 +46,13 @@ public class CannonInterfaceMenu extends AEBaseMenu {
             boolean currentGunpowderState = getGunpowderState();
             boolean currentCraftingState = getCraftingState();
             boolean currentGunpowderCraftingState = getGunpowderCraftingState();
+            boolean currentBulkCraftState = getBulkCraftState();
             PacketHandler.sendToClient(
                     new CannonInterfaceConfigClientPacket(
                             currentGunpowderState,
                             currentCraftingState,
-                            currentGunpowderCraftingState
+                            currentGunpowderCraftingState,
+                            currentBulkCraftState
                     ),
                     player
             );
@@ -73,6 +75,18 @@ public class CannonInterfaceMenu extends AEBaseMenu {
         } else {
             throw new IllegalStateException("Both entity and part are null or not null in CannonInterfaceMenu");
         }
+    }
+
+    public boolean getBulkCraftState() {
+        var entity = this.getHost().getEntity();
+        var part = this.getHost().getPart();
+
+        if (entity != null) {
+            return entity.getConfigState("bulkCraftState");
+        } else if (part != null) {
+            return part.getConfigState("bulkCraftState");
+        }
+        return false;
     }
 
     public boolean getGunpowderState() {

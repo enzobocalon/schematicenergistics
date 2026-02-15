@@ -38,6 +38,7 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
     private boolean gunpowderCraftingState = true; // default
     private boolean craftingState = true;
     private boolean gunpowderState = true;
+    private boolean bulkCraftState = false;
 
     public CannonInterfacePart(IPartItem<?> partItem) {
         super(partItem);
@@ -76,6 +77,7 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
         data.putBoolean("gunpowderState", this.gunpowderState);
         data.putBoolean("craftingState", this.craftingState);
         data.putBoolean("gunpowderCraftingState", this.gunpowderCraftingState);
+        data.putBoolean("bulkCraftState", this.bulkCraftState);
     }
 
     @Override
@@ -84,6 +86,7 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
         this.gunpowderState = data.getBoolean("gunpowderState");
         this.craftingState = data.getBoolean("craftingState");
         this.gunpowderCraftingState = data.getBoolean("gunpowderCraftingState");
+        this.bulkCraftState = data.getBoolean("bulkCraftState");
     }
 
     public CannonInterfaceLogic getLogic() {
@@ -99,6 +102,7 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
             this.cannonLogic.setCraftingState(this.craftingState);
             this.cannonLogic.setGunpowderState(this.gunpowderState);
             this.cannonLogic.setGunpowderCraftingState(this.gunpowderCraftingState);
+            this.cannonLogic.setBulkCraftState(this.bulkCraftState);
         }
         return this.cannonLogic;
     }
@@ -133,6 +137,12 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
                     this.cannonLogic.setGunpowderCraftingState(state);
                 }
                 break;
+            case "bulkCraftState":
+                this.bulkCraftState = state;
+                if (this.cannonLogic != null) {
+                    this.cannonLogic.setBulkCraftState(state);
+                }
+                break;
             default:
                 throw new IllegalArgumentException("Unknown config type: " + type);
         }
@@ -144,6 +154,7 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
             case "gunpowderState" -> this.gunpowderState;
             case "craftingState" -> this.craftingState;
             case "gunpowderCraftingState" -> this.gunpowderCraftingState;
+            case "bulkCraftState" -> this.bulkCraftState;
             default -> throw new IllegalArgumentException("Unknown config type: " + type);
         };
     }

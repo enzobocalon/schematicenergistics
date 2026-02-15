@@ -19,6 +19,10 @@ public class SEUtils {
     }
 
     public static Component formatCannonStatus(String statusMsg) {
+        if (statusMsg.equals("BULK_CRAFTING")) {
+            return Component.translatable("gui.schematicenergistics.cannon_interface.bulk_craft_status");
+        }
+
         Component translatableComponent = Component.translatable("create.schematicannon.status." + statusMsg);
 
         String text = translatableComponent.getString();

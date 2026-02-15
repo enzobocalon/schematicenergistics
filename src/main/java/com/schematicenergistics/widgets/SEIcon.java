@@ -15,7 +15,9 @@ public enum SEIcon {
     PLAY(112, 0),
     PAUSE(128, 0),
     STOP(144, 0),
-    BACK(160, 0);
+    BACK(160, 0),
+    BULK_CRAFT_DENY(176, 0),
+    BULK_CRAFT_ALLOW(192, 0);
 
     public final int x;
     public final int y;

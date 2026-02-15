@@ -27,5 +27,11 @@
   "gui.schematicenergistics.cannon_interface.stop": "Stop Cannon",
   "gui.schematicenergistics.cannon_interface.stop_hint": "Stops the Schematic Cannon.",
   "gui.schematicenergistics.cannon_terminal.title": "Cannon Interface Terminal",
-  "gui.schematicenergistics.cannon_terminal.return_terminal": "Return to Terminal"
+  "gui.schematicenergistics.cannon_terminal.return_terminal": "Return to Terminal",
+  "gui.schematicenergistics.cannon_interface.enable_bulk_craft": "Enable Bulk Crafting",
+  "gui.schematicenergistics.cannon_interface.enable_bulk_craft_hint": "Craft items in advance. Uses more CPU and may produce excess items.",
+  "gui.schematicenergistics.cannon_interface.disable_bulk_craft": "Disable Bulk Crafting",
+  "gui.schematicenergistics.cannon_interface.disable_bulk_craft_hint": "Items will be crafted only as needed.",
+  "gui.schematicenergistics.cannon_interface.bulk_craft_status": "Crafting items..."
+
 }

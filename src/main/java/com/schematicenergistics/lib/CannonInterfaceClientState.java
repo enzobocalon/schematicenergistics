@@ -4,12 +4,14 @@ public class CannonInterfaceClientState {
     private static boolean gunpowderState = false;
     private static boolean craftingState = false;
     private static boolean gunpowderCraftingState = false;
+    private static boolean bulkCraftState = false;
     private static boolean received = false;
 
-    public static void setState(boolean gunpowder, boolean crafting, boolean gunpowderCrafting) {
+    public static void setState(boolean gunpowder, boolean crafting, boolean gunpowderCrafting, boolean bulkCraftingState) {
         gunpowderState = gunpowder;
         craftingState = crafting;
         gunpowderCraftingState = gunpowderCrafting;
+        bulkCraftState = bulkCraftingState;
         received = true;
     }
 
@@ -23,6 +25,10 @@ public class CannonInterfaceClientState {
 
     public static boolean getCraftingState() {
         return craftingState;
+    }
+
+    public static boolean getBulkCraftState() {
+        return bulkCraftState;
     }
 
     public static boolean getGunpowderCraftingState() {

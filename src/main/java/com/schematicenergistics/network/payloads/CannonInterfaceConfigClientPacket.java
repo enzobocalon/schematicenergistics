@@ -15,16 +15,18 @@ public class CannonInterfaceConfigClientPacket {
     private final boolean gunpowderState;
     private final boolean craftingState;
     private final boolean gunpowderCraftingState;
+    private final boolean bulkCraftState;
 
-    public CannonInterfaceConfigClientPacket(boolean gunpowderState, boolean craftingState, boolean gunpowderCraftingState) {
+    public CannonInterfaceConfigClientPacket(boolean gunpowderState, boolean craftingState, boolean gunpowderCraftingState, boolean bulkCraftState) {
         this.gunpowderState = gunpowderState;
         this.craftingState = craftingState;
         this.gunpowderCraftingState = gunpowderCraftingState;
+        this.bulkCraftState = bulkCraftState;
     }
 
     // Decoder
     public static CannonInterfaceConfigClientPacket fromBytes(FriendlyByteBuf buf) {
-        return new CannonInterfaceConfigClientPacket(buf.readBoolean(), buf.readBoolean(), buf.readBoolean());
+        return new CannonInterfaceConfigClientPacket(buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean());
     }
 
     // Encoder
@@ -32,6 +34,7 @@ public class CannonInterfaceConfigClientPacket {
         buf.writeBoolean(gunpowderState);
         buf.writeBoolean(craftingState);
         buf.writeBoolean(gunpowderCraftingState);
+        buf.writeBoolean(bulkCraftState);
     }
 
     // Handle
@@ -41,7 +44,8 @@ public class CannonInterfaceConfigClientPacket {
                 CannonInterfaceClientState.setState(
                         packet.gunpowderState,
                         packet.craftingState,
-                        packet.gunpowderCraftingState
+                        packet.gunpowderCraftingState,
+                        packet.bulkCraftState
                 );
 
                 Minecraft mc = Minecraft.getInstance();
@@ -49,7 +53,8 @@ public class CannonInterfaceConfigClientPacket {
                     screen.updateStates(
                             packet.gunpowderState,
                             packet.craftingState,
-                            packet.gunpowderCraftingState
+                            packet.gunpowderCraftingState,
+                            packet.bulkCraftState
                     );
                 }
             });
