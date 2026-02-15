@@ -24,9 +24,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.Field;
 import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class CannonInterfaceLogic {
+    private static final long PRECRAFT_SUBMIT_TIMEOUT_TICKS = 20 * 60;
     private final Level level;
     private final IManagedGridNode node;
 
@@ -44,6 +50,10 @@ public class CannonInterfaceLogic {
     private boolean gunpowderCraftingState = true;
     private boolean craftingState = true;
     private boolean gunpowderState = true;
+
+    private boolean isPreCrafting = false;
+    private boolean hasPreCrafted = false;
+    private final Map<AEItemKey, CraftingHelper> pendingCraftingJobs = new HashMap<>();
 
     private SchematicannonBlockEntity cannonEntity;
 
@@ -68,16 +78,33 @@ public class CannonInterfaceLogic {
             builder.add(this.craftingHelper.getLink());
         if (this.gunpowderCraftingHelper.getLink() != null)
             builder.add(this.gunpowderCraftingHelper.getLink());
+        for (CraftingHelper helper : pendingCraftingJobs.values()) {
+            if (helper.getLink() != null) {
+                builder.add(helper.getLink());
+            }
+        }
         return builder.build();
     }
 
 
     public long insertCraftedItems(ICraftingLink link, AEKey what, long amount, Actionable mode) {
-        if (!(what instanceof AEItemKey)) return 0;
-        if (!link.equals(this.craftingHelper.getLink()) &&
-                !link.equals(this.gunpowderCraftingHelper.getLink())) {
+        if (!(what instanceof AEItemKey))
             return 0;
+
+        boolean isKnownLink = link.equals(this.craftingHelper.getLink())
+                || link.equals(this.gunpowderCraftingHelper.getLink());
+
+        if (!isKnownLink) {
+            for (CraftingHelper helper : pendingCraftingJobs.values()) {
+                if (link.equals(helper.getLink())) {
+                    isKnownLink = true;
+                    break;
+                }
+            }
         }
+
+        if (!isKnownLink)
+            return 0;
 
         if (node == null) return 0;
         var grid = node.getGrid();
@@ -92,8 +119,21 @@ public class CannonInterfaceLogic {
     public void jobStateChange(ICraftingLink link) {
         if (link.equals(this.craftingHelper.getLink())) {
             this.craftingHelper.setLink(null);
+            this.craftingHelper.clearReadyPlan();
         } else if (link.equals(this.gunpowderCraftingHelper.getLink())) {
             this.gunpowderCraftingHelper.setLink(null);
+            this.gunpowderCraftingHelper.clearReadyPlan();
+        } else {
+            Iterator<Map.Entry<AEItemKey, CraftingHelper>> it = pendingCraftingJobs.entrySet().iterator();
+            while (it.hasNext()) {
+                var helper = it.next().getValue();
+                if (link.equals(helper.getLink())) {
+                    helper.setLink(null);
+                    helper.clearReadyPlan();
+                    it.remove();
+                    break;
+                }
+            }
         }
     }
 
@@ -183,6 +223,8 @@ public class CannonInterfaceLogic {
             processingPending(gunpowderCraftingHelper);
         }
 
+        processPreCrafting();
+
         return TickRateModulation.FASTER;
     }
 
@@ -192,6 +234,54 @@ public class CannonInterfaceLogic {
 
     public BlockPos getTerminalPos() {
         return this.terminalPos;
+    }
+
+    private void processPreCrafting() {
+        if (!isPreCrafting)
+            return;
+
+        Iterator<Map.Entry<AEItemKey, CraftingHelper>> it = pendingCraftingJobs.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<AEItemKey, CraftingHelper> entry = it.next();
+            CraftingHelper helper = entry.getValue();
+
+            if (helper.getPendingCraft() != null) {
+                processingPending(helper);
+            } else if (helper.getLink() == null && helper.getReadyPlan() != null) {
+                var level = this.getLevel();
+                if (level != null) {
+                    long since = helper.getReadyPlanSinceTick();
+                    long now = level.getGameTime();
+                    if (since >= 0 && now - since > PRECRAFT_SUBMIT_TIMEOUT_TICKS) {
+                        helper.clearReadyPlan();
+                        it.remove();
+                        continue;
+                    }
+                }
+
+                var result = node.getGrid().getCraftingService().submitJob(
+                        helper.getReadyPlan(),
+                        this.requester,
+                        null,
+                        false,
+                        this.actionSource
+                );
+                if (result.successful()) {
+                    helper.setLink(result.link());
+                    helper.clearReadyPlan();
+                }
+            }
+
+            if (helper.getLink() == null && helper.getPendingCraft() == null && helper.getReadyPlan() == null) {
+                it.remove();
+            }
+        }
+
+        if (pendingCraftingJobs.isEmpty()) {
+            isPreCrafting = false;
+            hasPreCrafted = true;
+            sendSchematicannonState("RUNNING");
+        }
     }
 
     private void processingPending(CraftingHelper helper) {
@@ -211,6 +301,9 @@ public class CannonInterfaceLogic {
 
                     if (result.successful()) {
                         helper.setLink(result.link());
+                        helper.clearReadyPlan();
+                    } else {
+                        helper.setReadyPlan(plan);
                     }
                 }
             } catch (ExecutionException | InterruptedException e) {
@@ -224,13 +317,25 @@ public class CannonInterfaceLogic {
     public void sendSchematicannonState(String state) {
         BlockEntity be = this.getLinkedCannon();
         if (be instanceof SchematicannonBlockEntity cannonEntity) {
-            cannonEntity.state = SchematicannonBlockEntity.State.valueOf(state.toUpperCase());
-            cannonEntity.setChanged();
+            try {
+                cannonEntity.state = SchematicannonBlockEntity.State.valueOf(state.toUpperCase());
+                cannonEntity.setChanged();
+            } catch (IllegalArgumentException ignored) {
+            }
         }
     }
 
     public void setSchematicName(String name) {
-        this.schematicName = name;
+        if (this.schematicName == null) {
+            this.schematicName = "";
+        }
+        if (name == null) {
+            name = "";
+        }
+        if (!this.schematicName.equals(name)) {
+            this.schematicName = name;
+            this.hasPreCrafted = false;
+        }
     }
 
     public String getSchematicName() {
@@ -263,6 +368,171 @@ public class CannonInterfaceLogic {
 
     public void setState(String state) {
         this.state = state;
+        if ("STOPPED".equals(state)) {
+            this.hasPreCrafted = false;
+            this.isPreCrafting = false;
+            this.pendingCraftingJobs.clear();
+        }
+
+        if ("RUNNING".equals(state) && !hasPreCrafted && !isPreCrafting) {
+            if (startPreCrafting()) {
+                sendSchematicannonState("PAUSED");
+                this.state = "PAUSED";
+            } else {
+                hasPreCrafted = true;
+            }
+        }
+    }
+
+    private boolean startPreCrafting() {
+        if (node == null)
+            return false;
+        var grid = node.getGrid();
+        if (grid == null)
+            return false;
+        var storage = grid.getStorageService().getInventory();
+        var craftingService = grid.getCraftingService();
+        if (storage == null || craftingService == null)
+            return false;
+
+        var cannon = this.getLinkedCannon();
+        if (cannon == null)
+            return false;
+
+        Object checklist = null;
+        try {
+            for (Field f : cannon.getClass().getDeclaredFields()) {
+                f.setAccessible(true);
+                Object val = f.get(cannon);
+                if (val != null && val.getClass().getName().endsWith("MaterialChecklist")) {
+                    checklist = val;
+                    break;
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        if (checklist == null)
+            return false;
+
+        Object requiredObj = null;
+        try {
+            Field requiredField = checklist.getClass().getDeclaredField("required");
+            requiredField.setAccessible(true);
+            requiredObj = requiredField.get(checklist);
+        } catch (Exception ignored) {
+        }
+
+        if (!(requiredObj instanceof Map))
+            return false;
+
+        Map<?, ?> requiredMap = (Map<?, ?>) requiredObj;
+        if (requiredMap.isEmpty())
+            return false;
+
+        Map<AEItemKey, Long> totalRequired = new HashMap<>();
+        for (Map.Entry<?, ?> e : requiredMap.entrySet()) {
+            Object k = e.getKey();
+            Object v = e.getValue();
+            if (!(v instanceof Number))
+                continue;
+            int qty = ((Number) v).intValue();
+            if (qty <= 0)
+                continue;
+            ItemStack stack = extractItemStack(k);
+            if (stack == null || stack.isEmpty())
+                continue;
+            AEItemKey key = AEItemKey.of(stack);
+            if (key != null) {
+                totalRequired.merge(key, (long) qty, Long::sum);
+            }
+        }
+
+        if (totalRequired.isEmpty())
+            return false;
+
+        this.pendingCraftingJobs.clear();
+
+        boolean startedAny = false;
+        for (Map.Entry<AEItemKey, Long> e : totalRequired.entrySet()) {
+            AEItemKey key = e.getKey();
+            long required = e.getValue();
+            long available = storage.getAvailableStacks().get(key);
+
+            if (available < required && craftingService.isCraftable(key)) {
+                long toCraft = required - available;
+                CraftingHelper helper = new CraftingHelper(this);
+                helper.startCraft(key, toCraft, CalculationStrategy.REPORT_MISSING_ITEMS);
+                if (helper.getPendingCraft() != null) {
+                    pendingCraftingJobs.put(key, helper);
+                    startedAny = true;
+                }
+            }
+        }
+
+        if (startedAny) {
+            this.isPreCrafting = true;
+        }
+
+        return startedAny;
+    }
+
+    private ItemStack extractItemStack(Object obj) {
+        if (obj == null)
+            return null;
+        if (obj instanceof ItemStack)
+            return (ItemStack) obj;
+        if (obj instanceof net.minecraft.world.item.Item)
+            return new ItemStack((net.minecraft.world.item.Item) obj);
+        if (obj instanceof net.minecraft.world.level.block.Block)
+            return new ItemStack((net.minecraft.world.level.block.Block) obj);
+
+        try {
+            for (var m : obj.getClass().getMethods()) {
+                if (m.getParameterCount() != 0)
+                    continue;
+                var rt = m.getReturnType();
+                if (rt == ItemStack.class) {
+                    Object v = m.invoke(obj);
+                    if (v instanceof ItemStack)
+                        return (ItemStack) v;
+                } else if (rt == net.minecraft.world.item.Item.class) {
+                    Object v = m.invoke(obj);
+                    if (v instanceof net.minecraft.world.item.Item)
+                        return new ItemStack((net.minecraft.world.item.Item) v);
+                } else if (rt == net.minecraft.world.level.block.Block.class) {
+                    Object v = m.invoke(obj);
+                    if (v instanceof net.minecraft.world.level.block.Block)
+                        return new ItemStack((net.minecraft.world.level.block.Block) v);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+
+        try {
+            Field stackField = null;
+            try {
+                stackField = obj.getClass().getDeclaredField("stack");
+            } catch (NoSuchFieldException e) {
+                Class<?> sc = obj.getClass().getSuperclass();
+                if (sc != null && sc != Object.class) {
+                    try {
+                        stackField = sc.getDeclaredField("stack");
+                    } catch (NoSuchFieldException ignored) {
+                    }
+                }
+            }
+
+            if (stackField != null) {
+                stackField.setAccessible(true);
+                Object v = stackField.get(obj);
+                if (v instanceof ItemStack)
+                    return (ItemStack) v;
+            }
+        } catch (Exception ignored) {
+        }
+
+        return null;
     }
 
     public String getState() {

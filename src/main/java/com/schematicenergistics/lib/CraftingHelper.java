@@ -2,6 +2,7 @@ package com.schematicenergistics.lib;
 
 import appeng.api.networking.crafting.CalculationStrategy;
 import appeng.api.networking.crafting.ICraftingLink;
+import appeng.api.networking.crafting.ICraftingPlan;
 import appeng.api.stacks.AEItemKey;
 import com.schematicenergistics.logic.CannonInterfaceLogic;
 
@@ -10,6 +11,8 @@ public class CraftingHelper {
     private CraftingRequest pendingCraft;
     private final CannonInterfaceLogic cannonLogic;
     private ICraftingLink link;
+    private ICraftingPlan readyPlan;
+    private long readyPlanSinceTick = -1;
 
     public CraftingHelper(CannonInterfaceLogic logic) {
         this.cannonLogic = logic;
@@ -60,5 +63,24 @@ public class CraftingHelper {
 
     public CraftingRequest getPendingCraft() {
         return this.pendingCraft;
+    }
+
+    public ICraftingPlan getReadyPlan() {
+        return this.readyPlan;
+    }
+
+    public long getReadyPlanSinceTick() {
+        return this.readyPlanSinceTick;
+    }
+
+    public void setReadyPlan(ICraftingPlan plan) {
+        this.readyPlan = plan;
+        var level = this.cannonLogic.getLevel();
+        this.readyPlanSinceTick = level != null ? level.getGameTime() : -1;
+    }
+
+    public void clearReadyPlan() {
+        this.readyPlan = null;
+        this.readyPlanSinceTick = -1;
     }
 }
