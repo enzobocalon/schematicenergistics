@@ -4,6 +4,8 @@ import appeng.api.parts.IPart;
 import appeng.api.parts.IPartHost;
 import appeng.api.stacks.AEItemKey;
 import com.schematicenergistics.blockentity.CannonInterfaceEntity;
+import com.schematicenergistics.lib.ISchematicAccessor;
+import com.simibubi.create.content.schematics.cannon.MaterialChecklist;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonInventory;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
@@ -24,7 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.schematicenergistics.part.CannonInterfacePart;
 
 @Mixin({SchematicannonBlockEntity.class})
-public abstract class SchematicCannonMixin {
+public abstract class SchematicCannonMixin implements ISchematicAccessor {
     @Shadow
     public SchematicannonInventory inventory;
 
@@ -35,10 +37,22 @@ public abstract class SchematicCannonMixin {
     public ItemStack missingItem;
 
     @Shadow
+    public MaterialChecklist checklist;
+
+    @Shadow
     public SchematicannonBlockEntity.State state;
 
     @Shadow
     public String statusMsg;
+
+    @Shadow
+    public abstract void updateChecklist();
+
+    @Override
+    public MaterialChecklist schematicenergistics$getChecklist() {
+        updateChecklist();
+        return checklist;
+    }
 
     @Inject(
             method = {"initializePrinter"},

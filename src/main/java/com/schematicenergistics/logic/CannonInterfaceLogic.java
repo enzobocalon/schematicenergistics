@@ -15,14 +15,20 @@ import appeng.api.stacks.AEKey;
 import appeng.api.storage.MEStorage;
 import appeng.core.settings.TickRates;
 import com.google.common.collect.ImmutableSet;
+import com.schematicenergistics.lib.ISchematicAccessor;
+import com.simibubi.create.content.schematics.cannon.MaterialChecklist;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.schematicenergistics.lib.CraftingHelper;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 import java.util.concurrent.ExecutionException;
@@ -31,7 +37,10 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static org.openjdk.nashorn.internal.runtime.regexp.joni.Config.log;
+
 public class CannonInterfaceLogic {
+    private static final Logger log = LoggerFactory.getLogger(CannonInterfaceLogic.class);
     private static final long PRECRAFT_SUBMIT_TIMEOUT_TICKS = 20 * 60;
     private final Level level;
     private final IManagedGridNode node;
@@ -376,6 +385,7 @@ public class CannonInterfaceLogic {
                 setStatusMsg("BULK_CRAFTING");
             }
             if ("STOPPED".equals(state)) {
+                cancelAllPendingCrafts();
                 this.hasPreCrafted = false;
                 this.isPreCrafting = false;
                 this.pendingCraftingJobs.clear();
@@ -394,88 +404,100 @@ public class CannonInterfaceLogic {
     }
 
     private boolean startPreCrafting() {
-        if (node == null)
+        if (!(this.cannonEntity instanceof ISchematicAccessor accessor)) {
             return false;
-        var grid = node.getGrid();
+        }
+
+        MaterialChecklist checklist = accessor.schematicenergistics$getChecklist();
+
+        if (checklist == null) {
+            return false;
+        }
+
+        if (checklist.required.isEmpty() && checklist.damageRequired.isEmpty()) {
+            return false;
+        }
+
+        var grid = this.node.getGrid();
         if (grid == null)
             return false;
+
         var storage = grid.getStorageService().getInventory();
         var craftingService = grid.getCraftingService();
         if (storage == null || craftingService == null)
             return false;
 
-        var cannon = this.getLinkedCannon();
-        if (cannon == null)
-            return false;
-
-        Object checklist = null;
-        try {
-            for (Field f : cannon.getClass().getDeclaredFields()) {
-                f.setAccessible(true);
-                Object val = f.get(cannon);
-                if (val != null && val.getClass().getName().endsWith("MaterialChecklist")) {
-                    checklist = val;
-                    break;
-                }
-            }
-        } catch (Exception ignored) {
-        }
-
-        if (checklist == null)
-            return false;
-
-        Object requiredObj = null;
-        try {
-            Field requiredField = checklist.getClass().getDeclaredField("required");
-            requiredField.setAccessible(true);
-            requiredObj = requiredField.get(checklist);
-        } catch (Exception ignored) {
-        }
-
-        if (!(requiredObj instanceof Map))
-            return false;
-
-        Map<?, ?> requiredMap = (Map<?, ?>) requiredObj;
-        if (requiredMap.isEmpty())
-            return false;
-
         Map<AEItemKey, Long> totalRequired = new HashMap<>();
-        for (Map.Entry<?, ?> e : requiredMap.entrySet()) {
-            Object k = e.getKey();
-            Object v = e.getValue();
-            if (!(v instanceof Number))
+
+        for (Object2IntMap.Entry<Item> entry : checklist.required.object2IntEntrySet()) {
+            Item item = entry.getKey();
+            int required = entry.getIntValue();
+
+            int gathered = checklist.gathered.getOrDefault(item, 0);
+            int needed = required - gathered;
+
+            if (needed <= 0) {
                 continue;
-            int qty = ((Number) v).intValue();
-            if (qty <= 0)
-                continue;
-            ItemStack stack = extractItemStack(k);
-            if (stack == null || stack.isEmpty())
-                continue;
+            }
+
+            ItemStack stack = new ItemStack(item);
             AEItemKey key = AEItemKey.of(stack);
             if (key != null) {
-                totalRequired.merge(key, (long) qty, Long::sum);
+                totalRequired.put(key, (long) needed);
             }
         }
 
-        if (totalRequired.isEmpty())
-            return false;
+        for (Object2IntMap.Entry<Item> entry : checklist.damageRequired.object2IntEntrySet()) {
+            Item item = entry.getKey();
+            int damageAmount = entry.getIntValue();
 
-        this.pendingCraftingJobs.clear();
+            ItemStack stack = new ItemStack(item);
+            int maxDamage = stack.getMaxDamage();
+            if (maxDamage > 0) {
+                int itemsNeeded = (int) Math.ceil(damageAmount / (double) maxDamage);
+
+                int gathered = checklist.gathered.getOrDefault(item, 0);
+                itemsNeeded -= gathered;
+
+                if (itemsNeeded <= 0) {
+                    continue;
+                }
+
+                AEItemKey key = AEItemKey.of(stack);
+                if (key != null) {
+                    totalRequired.merge(key, (long) itemsNeeded, Long::sum);
+                }
+            }
+        }
+
+        if (totalRequired.isEmpty()) {
+            return false;
+        }
 
         boolean startedAny = false;
-        for (Map.Entry<AEItemKey, Long> e : totalRequired.entrySet()) {
-            AEItemKey key = e.getKey();
-            long required = e.getValue();
+
+        for (Map.Entry<AEItemKey, Long> entry : totalRequired.entrySet()) {
+            AEItemKey key = entry.getKey();
+            long needed = entry.getValue();
+
             long available = storage.getAvailableStacks().get(key);
 
-            if (available < required && craftingService.isCraftable(key)) {
-                long toCraft = required - available;
-                CraftingHelper helper = new CraftingHelper(this);
-                helper.startCraft(key, toCraft, CalculationStrategy.REPORT_MISSING_ITEMS);
-                if (helper.getPendingCraft() != null) {
-                    pendingCraftingJobs.put(key, helper);
-                    startedAny = true;
-                }
+            if (available >= needed) {
+                continue;
+            }
+
+            long toCraft = needed - available;
+
+            if (!craftingService.isCraftable(key)) {
+                continue;
+            }
+
+            CraftingHelper helper = new CraftingHelper(this);
+            helper.startCraft(key, toCraft, CalculationStrategy.REPORT_MISSING_ITEMS);
+
+            if (helper.getPendingCraft() != null) {
+                pendingCraftingJobs.put(key, helper);
+                startedAny = true;
             }
         }
 
@@ -486,62 +508,27 @@ public class CannonInterfaceLogic {
         return startedAny;
     }
 
-    private ItemStack extractItemStack(Object obj) {
-        if (obj == null)
-            return null;
-        if (obj instanceof ItemStack)
-            return (ItemStack) obj;
-        if (obj instanceof net.minecraft.world.item.Item)
-            return new ItemStack((net.minecraft.world.item.Item) obj);
-        if (obj instanceof net.minecraft.world.level.block.Block)
-            return new ItemStack((net.minecraft.world.level.block.Block) obj);
+    private void cancelAllPendingCrafts() {
 
-        try {
-            for (var m : obj.getClass().getMethods()) {
-                if (m.getParameterCount() != 0)
-                    continue;
-                var rt = m.getReturnType();
-                if (rt == ItemStack.class) {
-                    Object v = m.invoke(obj);
-                    if (v instanceof ItemStack)
-                        return (ItemStack) v;
-                } else if (rt == net.minecraft.world.item.Item.class) {
-                    Object v = m.invoke(obj);
-                    if (v instanceof net.minecraft.world.item.Item)
-                        return new ItemStack((net.minecraft.world.item.Item) v);
-                } else if (rt == net.minecraft.world.level.block.Block.class) {
-                    Object v = m.invoke(obj);
-                    if (v instanceof net.minecraft.world.level.block.Block)
-                        return new ItemStack((net.minecraft.world.level.block.Block) v);
+        for (Map.Entry<AEItemKey, CraftingHelper> entry : pendingCraftingJobs.entrySet()) {
+            CraftingHelper helper = entry.getValue();
+            if (helper.getLink() != null) {
+                try {
+                    helper.getLink().cancel();
+                } catch (Exception e) {
+                    log.error("Failed to cancel craft link for {}", entry.getKey(), e);
                 }
+                helper.setLink(null);
             }
-        } catch (Exception ignored) {
+
+            if (helper.getPendingCraft() != null) {
+                helper.clearPendingCraft();
+            }
+
+            if (helper.getReadyPlan() != null) {
+                helper.clearReadyPlan();
+            }
         }
-
-        try {
-            Field stackField = null;
-            try {
-                stackField = obj.getClass().getDeclaredField("stack");
-            } catch (NoSuchFieldException e) {
-                Class<?> sc = obj.getClass().getSuperclass();
-                if (sc != null && sc != Object.class) {
-                    try {
-                        stackField = sc.getDeclaredField("stack");
-                    } catch (NoSuchFieldException ignored) {
-                    }
-                }
-            }
-
-            if (stackField != null) {
-                stackField.setAccessible(true);
-                Object v = stackField.get(obj);
-                if (v instanceof ItemStack)
-                    return (ItemStack) v;
-            }
-        } catch (Exception ignored) {
-        }
-
-        return null;
     }
 
     public String getState() {
