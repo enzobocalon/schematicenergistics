@@ -248,32 +248,7 @@ public class CannonInterfaceLogic {
             processPreCrafting();
         }
 
-//        isChecklistReady();
-
         return TickRateModulation.FASTER;
-    }
-
-    private boolean isChecklistReady() {
-        if (!(this.cannonEntity instanceof ISchematicAccessor accessor)) {
-            return false;
-        }
-
-        MaterialChecklist checklist = accessor.schematicenergistics$getChecklist();
-
-        if (checklist == null) {
-            log.debug("Checklist is null");
-            return false;
-        }
-
-        boolean hasItems = !checklist.required.isEmpty() || !checklist.damageRequired.isEmpty();
-
-        if (!hasItems) {
-            log.debug("Checklist is empty - required: {}, damage: {}",
-                    checklist.required.size(),
-                    checklist.damageRequired.size());
-        }
-
-        return hasItems;
     }
 
     private void processPreCrafting() {
@@ -524,9 +499,6 @@ public class CannonInterfaceLogic {
         }
 
         boolean startedAny = false;
-        int craftingStarted = 0;
-        int alreadyAvailable = 0;
-        int notCraftable = 0;
 
         for (Map.Entry<AEItemKey, Long> entry : totalRequired.entrySet()) {
             AEItemKey key = entry.getKey();
@@ -535,20 +507,14 @@ public class CannonInterfaceLogic {
             long available = storage.getAvailableStacks().get(key);
 
             if (available >= needed) {
-                alreadyAvailable++;
                 continue;
             }
 
             long toCraft = needed - available;
 
             if (!craftingService.isCraftable(key)) {
-                notCraftable++;
-                log.warn("Item {} not craftable (need {})", key, toCraft);
                 continue;
             }
-
-            log.info("Crafting: {} x{} (have={}, need={})",
-                    key, toCraft, available, needed);
 
             CraftingHelper helper = new CraftingHelper(this);
             helper.startCraft(key, toCraft, CalculationStrategy.REPORT_MISSING_ITEMS);
@@ -556,12 +522,8 @@ public class CannonInterfaceLogic {
             if (helper.getPendingCraft() != null) {
                 pendingCraftingJobs.put(key, helper);
                 startedAny = true;
-                craftingStarted++;
             }
         }
-
-        log.info("Bulk craft queued - Crafting: {}, Available: {}, Not craftable: {}",
-                craftingStarted, alreadyAvailable, notCraftable);
 
         if (startedAny) {
             this.isPreCrafting = true;
