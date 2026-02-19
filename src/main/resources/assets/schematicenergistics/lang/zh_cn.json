@@ -27,5 +27,13 @@
     "gui.schematicenergistics.cannon_interface.stop": "停止加农炮",
     "gui.schematicenergistics.cannon_interface.stop_hint": "停止蓝图加农炮。",
     "gui.schematicenergistics.cannon_terminal.title": "蓝图加农炮接口终端",
-    "gui.schematicenergistics.cannon_terminal.return_terminal": "返回终端"
+    "gui.schematicenergistics.cannon_terminal.return_terminal": "返回终端",
+    "gui.schematicenergistics.cannon_interface.enable_bulk_craft": "启用批量预合成",
+    "gui.schematicenergistics.cannon_interface.enable_bulk_craft_hint": "提前合成物品。占用更多 CPU，且可能产生多余物品。",
+    "gui.schematicenergistics.cannon_interface.disable_bulk_craft": "禁用批量预合成",
+    "gui.schematicenergistics.cannon_interface.disable_bulk_craft_hint": "物品将仅在需要时合成。",
+    "gui.schematicenergistics.cannon_interface.bulk_craft_status": "正在预合成物品…",
+    "gui.schematicenergistics.cannon_interface.materials": "材料",
+    "gui.schematicenergistics.cannon_interface.materials_title": "材料清单",
+    "gui.schematicenergistics.cannon_interface.materials_detail": "库存 %s / 需求 %s（已收集 %s）"
 }

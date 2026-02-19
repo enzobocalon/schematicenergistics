@@ -23,6 +23,7 @@ repositories {
     maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     maven { url = "https://mvn.devos.one/snapshots" } // Registrate
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" } // ForgeConfigAPIPort
+    maven { url = "https://maven.blamejared.com" } // JEI
 }
 
 base {
@@ -107,6 +108,9 @@ dependencies {
     implementation("com.tterrag.registrate:Registrate:${registrate_version}")
     compileOnly "org.appliedenergistics:guideme:${guideme_version}:api"
     runtimeOnly "org.appliedenergistics:guideme:${guideme_version}"
+    
+    compileOnly("mezz.jei:jei-1.21.1-neoforge-api:19.21.1.312")
+    runtimeOnly("mezz.jei:jei-1.21.1-neoforge:19.21.1.312")
 }
 
 var generateModMetadata = tasks.register("generateModMetadata", ProcessResources) {
