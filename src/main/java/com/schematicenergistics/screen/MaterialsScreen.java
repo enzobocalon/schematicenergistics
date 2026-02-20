@@ -71,10 +71,10 @@ public class MaterialsScreen extends AEBaseScreen<MaterialsMenu> {
     }
 
     public void onReturn() {
-        var be = menu.getBlockEntity();
-        if (be != null) {
+        var pos = menu.getHostPos();
+        if (pos != null) {
             PacketDistributor.sendToServer(
-                    new ReturnToCannonInterfacePacket(be.getBlockPos()));
+                    new ReturnToCannonInterfacePacket(pos));
         }
     }
 
