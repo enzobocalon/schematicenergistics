@@ -1,3 +1,8 @@
 package com.schematicenergistics.logic;
 
-public interface IMaterialChecklistAccessor { }
+import com.schematicenergistics.logic.CannonInterfaceLogic;
+
+public interface IMaterialChecklistAccessor {
+    CannonInterfaceLogic schematicenergistics$getLogic();
+    void schematicenergistics$setLogic(CannonInterfaceLogic logic);
+}

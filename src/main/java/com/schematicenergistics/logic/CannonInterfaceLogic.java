@@ -1,13 +1,12 @@
 package com.schematicenergistics.logic;
 
 import appeng.api.config.Actionable;
+import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.IManagedGridNode;
-import appeng.api.networking.crafting.CalculationStrategy;
-import appeng.api.networking.crafting.ICraftingLink;
-import appeng.api.networking.crafting.ICraftingPlan;
-import appeng.api.networking.crafting.ICraftingRequester;
+import appeng.api.networking.crafting.*;
 import appeng.api.networking.security.IActionSource;
+import appeng.api.networking.storage.IStorageService;
 import appeng.api.networking.ticking.TickRateModulation;
 import appeng.api.networking.ticking.TickingRequest;
 import appeng.api.stacks.AEItemKey;
@@ -23,16 +22,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.List;
 import java.util.Iterator;
-import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.schematicenergistics.util.ISchematicAccessor;
 
 import org.slf4j.Logger;
@@ -76,6 +72,32 @@ public class CannonInterfaceLogic {
         this.craftingHelper = new CraftingHelper(this);
         this.gunpowderCraftingHelper = new CraftingHelper(this);
         this.requester = requester;
+    }
+
+    public @Nullable MEStorage getStorage() {
+        IManagedGridNode node = this.getGridNode();
+        if (node == null) return null;
+
+        IGrid grid = node.getGrid();
+
+        if (grid == null) return null;
+
+        IStorageService storageService = grid.getStorageService();
+
+        if (storageService == null) return null;
+
+        return storageService.getInventory();
+    }
+
+    public @Nullable ICraftingService getCraftingService() {
+        IManagedGridNode node = this.getGridNode();
+        if (node == null) return null;
+
+        IGrid grid = node.getGrid();
+
+        if (grid == null) return null;
+
+        return grid.getCraftingService();
     }
 
     public Level getLevel() {

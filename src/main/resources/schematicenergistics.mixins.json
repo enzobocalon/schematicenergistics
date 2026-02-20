@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "schematicenergistics.refmap.json",
   "mixins": [
-    "SchematicCannonMixin"
+    "SchematicCannonMixin",
+    "MaterialChecklistMixin"
   ],
   "client": [],
   "injectors": {

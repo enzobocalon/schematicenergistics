@@ -5,11 +5,13 @@ import appeng.client.gui.AEBaseScreen;
 import appeng.client.gui.style.Blitter;
 import appeng.client.gui.style.ScreenStyle;
 import appeng.client.gui.widgets.Scrollbar;
+import com.schematicenergistics.lib.ColorHelper;
 import com.schematicenergistics.lib.MaterialListEntry;
 import com.schematicenergistics.menu.MaterialsMenu;
 import com.schematicenergistics.network.payloads.ReturnToCannonInterfacePacket;
 import com.schematicenergistics.widgets.SEIcon;
 import com.schematicenergistics.widgets.SESimpleIconButton;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
@@ -53,7 +55,7 @@ public class MaterialsScreen extends AEBaseScreen<MaterialsMenu> {
 
         SESimpleIconButton backButton = new SESimpleIconButton(
                 SEIcon.BACK,
-                Component.translatable("gui.schematicenergistics.cannon_interface.return"),
+                Component.translatable("gui.schematicenergistics.materials.return_interface"),
                 Component.empty(),
                 btn -> onReturn()
         );
@@ -156,8 +158,13 @@ public class MaterialsScreen extends AEBaseScreen<MaterialsMenu> {
     }
 
     private int getQtyColor(MaterialRow row) {
-        if (row.available() >= row.required()) return 0xFF4CAF50;
-        return row.craftable() ? 0xFFFFC107 : 0xFFF44336;
+        if (row.available() >= row.required()) {
+            return ColorHelper.COMPLETE;
+        }
+        if (row.available() > 0) {
+            return ColorHelper.PARTIAL;
+        }
+        return row.craftable() ? ColorHelper.CRAFTABLE : ColorHelper.MISSING;
     }
 
     private String truncateByWidth(String text, int maxWidth) {
