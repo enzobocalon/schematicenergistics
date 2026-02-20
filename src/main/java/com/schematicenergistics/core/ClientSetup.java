@@ -14,6 +14,7 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import com.schematicenergistics.screen.CannonInterfaceScreen;
 import com.schematicenergistics.screen.CannonInterfaceTerminalScreen;
+import com.schematicenergistics.screen.MaterialsScreen;
 
 @EventBusSubscriber(modid = SchematicEnergistics.MOD_ID, bus = Bus.MOD, value = Dist.CLIENT)
 public class ClientSetup {
@@ -32,6 +33,13 @@ public class ClientSetup {
                 Registration.CANNON_INTERFACE_TERMINAL_MENU.get(),
                 CannonInterfaceTerminalScreen::new,
                 "/screens/cannon_interface_terminal.json"
+        );
+
+        InitScreens.register(
+                event,
+                Registration.MATERIALS_MENU.get(),
+                MaterialsScreen::new,
+                "/screens/materials.json"
         );
     }
 

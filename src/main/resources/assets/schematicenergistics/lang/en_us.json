@@ -35,5 +35,6 @@
   "gui.schematicenergistics.cannon_interface.bulk_craft_status": "Crafting items...",
   "gui.schematicenergistics.cannon_interface.materials": "Materials",
   "gui.schematicenergistics.cannon_interface.materials_title": "Material List",
-  "gui.schematicenergistics.cannon_interface.materials_detail": "Stock %s / Need %s (Gathered %s)"
+  "gui.schematicenergistics.cannon_interface.materials_detail": "Stock %s / Need %s (Gathered %s)",
+  "gui.schematicenergistics.cannon_interface.return": "Return to Cannon Interface"
 }

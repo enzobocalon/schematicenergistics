@@ -1,7 +1,7 @@
 package com.schematicenergistics.compat;
 
 import com.schematicenergistics.SchematicEnergistics;
-import com.schematicenergistics.screen.CannonInterfaceScreen;
+import com.schematicenergistics.screen.MaterialsScreen;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.constants.VanillaTypes;
@@ -42,7 +42,7 @@ public class JeiCompat implements IModPlugin {
 
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addGuiContainerHandler(CannonInterfaceScreen.class, new CannonInterfaceGuiHandler());
+        registration.addGuiContainerHandler(MaterialsScreen.class, new MaterialsGuiHandler());
     }
 
     public static boolean isJeiLoaded() {
@@ -50,15 +50,15 @@ public class JeiCompat implements IModPlugin {
     }
 
     @SuppressWarnings("deprecation")
-    private static class CannonInterfaceGuiHandler implements IGuiContainerHandler<CannonInterfaceScreen> {
+    private static class MaterialsGuiHandler implements IGuiContainerHandler<MaterialsScreen> {
         @Override
-        public List<Rect2i> getGuiExtraAreas(CannonInterfaceScreen screen) {
-            return screen.getMaterialsBoundsForJei();
+        public List<Rect2i> getGuiExtraAreas(MaterialsScreen screen) {
+            return screen.getExclusionAreasForJei();
         }
 
         @Override
         public Optional<IClickableIngredient<?>> getClickableIngredientUnderMouse(
-                CannonInterfaceScreen screen,
+                MaterialsScreen screen,
                 double mouseX,
                 double mouseY
         ) {

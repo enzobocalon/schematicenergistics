@@ -66,9 +66,14 @@ public class PacketHandler {
                                 handler(MaterialListSubscribePacket::handle));
 
                 registrar.playToServer(
-                                MaterialListPageRequestPacket.TYPE,
-                                MaterialListPageRequestPacket.STREAM_CODEC,
-                                handler(MaterialListPageRequestPacket::handle));
+                                OpenMaterialsScreenPacket.TYPE,
+                                OpenMaterialsScreenPacket.STREAM_CODEC,
+                                handler(OpenMaterialsScreenPacket::handle));
+
+                registrar.playToServer(
+                                ReturnToCannonInterfacePacket.TYPE,
+                                ReturnToCannonInterfacePacket.STREAM_CODEC,
+                                handler(ReturnToCannonInterfacePacket::handle));
         }
 
         private static <T extends CustomPacketPayload> IPayloadHandler<T> handler(IPayloadHandler<T> handler) {

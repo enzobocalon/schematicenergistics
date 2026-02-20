@@ -15,6 +15,7 @@ import com.schematicenergistics.SchematicEnergistics;
 import com.schematicenergistics.logic.ICannonInterfaceHost;
 import com.schematicenergistics.menu.CannonInterfaceMenu;
 import com.schematicenergistics.menu.CannonInterfaceTerminalMenu;
+import com.schematicenergistics.menu.MaterialsMenu;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.MenuType;
@@ -47,6 +48,7 @@ public final class Registration {
     public static DeferredItem<PartItem<CannonInterfaceTerminal>> CANNON_TERMINAL;
     public static final Supplier<MenuType<CannonInterfaceMenu>> CANNON_INTERFACE_MENU;
     public static final Supplier<MenuType<CannonInterfaceTerminalMenu>> CANNON_INTERFACE_TERMINAL_MENU;
+    public static final Supplier<MenuType<MaterialsMenu>> MATERIALS_MENU;
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(
@@ -105,5 +107,10 @@ public final class Registration {
                 MENUS.register("cannon_interface_terminal", () ->
                         MenuTypeBuilder.create(CannonInterfaceTerminalMenu::new, IMonitorPart.class)
                                 .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface_terminal")));
+
+        MATERIALS_MENU =
+                MENUS.register("materials", () ->
+                        MenuTypeBuilder.create(MaterialsMenu::new, ICannonInterfaceHost.class)
+                                .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "materials")));
     }
 }

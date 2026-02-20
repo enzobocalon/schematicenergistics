@@ -8,7 +8,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
-import com.schematicenergistics.screen.CannonInterfaceScreen;
+import com.schematicenergistics.screen.MaterialsScreen;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public record MaterialListClientPacket(int page, int totalPages, List<MaterialLi
     public static void handle(MaterialListClientPacket packet, IPayloadContext context) {
         context.enqueueWork(() -> {
             var minecraft = Minecraft.getInstance();
-            if (minecraft.screen instanceof CannonInterfaceScreen screen) {
+            if (minecraft.screen instanceof MaterialsScreen screen) {
                 screen.receiveMaterialsData(packet.page(), packet.totalPages(), packet.entries());
             }
         });

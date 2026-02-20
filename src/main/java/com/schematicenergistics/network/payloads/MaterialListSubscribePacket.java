@@ -1,7 +1,7 @@
 package com.schematicenergistics.network.payloads;
 
 import com.schematicenergistics.SchematicEnergistics;
-import com.schematicenergistics.menu.CannonInterfaceMenu;
+import com.schematicenergistics.menu.MaterialsMenu;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,12 +18,7 @@ public record MaterialListSubscribePacket(boolean subscribed) implements CustomP
             MaterialListSubscribePacket::new);
 
     public static void handle(MaterialListSubscribePacket packet, IPayloadContext context) {
-        context.enqueueWork(() -> {
-            if (context.player() instanceof ServerPlayer player
-                    && player.containerMenu instanceof CannonInterfaceMenu menu) {
-                menu.setMaterialsSubscribed(packet.subscribed());
-            }
-        });
+        // No-op: MaterialsMenu auto-subscribes. Kept for network protocol compatibility.
     }
 
     @Override
