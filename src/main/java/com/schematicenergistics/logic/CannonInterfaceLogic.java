@@ -1,13 +1,12 @@
 package com.schematicenergistics.logic;
 
 import appeng.api.config.Actionable;
+import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNode;
 import appeng.api.networking.IManagedGridNode;
-import appeng.api.networking.crafting.CalculationStrategy;
-import appeng.api.networking.crafting.ICraftingLink;
-import appeng.api.networking.crafting.ICraftingPlan;
-import appeng.api.networking.crafting.ICraftingRequester;
+import appeng.api.networking.crafting.*;
 import appeng.api.networking.security.IActionSource;
+import appeng.api.networking.storage.IStorageService;
 import appeng.api.networking.ticking.TickRateModulation;
 import appeng.api.networking.ticking.TickingRequest;
 import appeng.api.stacks.AEItemKey;
@@ -401,6 +400,32 @@ public class CannonInterfaceLogic {
             }
 
         }
+    }
+
+    public @Nullable MEStorage getStorage() {
+        IManagedGridNode node = this.getGridNode();
+        if (node == null) return null;
+
+        IGrid grid = node.getGrid();
+
+        if (grid == null) return null;
+
+        IStorageService storageService = grid.getStorageService();
+
+        if (storageService == null) return null;
+
+        return storageService.getInventory();
+    }
+
+    public @Nullable ICraftingService getCraftingService() {
+        IManagedGridNode node = this.getGridNode();
+        if (node == null) return null;
+
+        IGrid grid = node.getGrid();
+
+        if (grid == null) return null;
+
+        return grid.getCraftingService();
     }
 
     private boolean startPreCrafting() {
