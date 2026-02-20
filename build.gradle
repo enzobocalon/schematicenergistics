@@ -87,6 +87,7 @@ repositories {
     maven {
         url "https://cursemaven.com"
     }
+    maven { url = "https://maven.blamejared.com" } // JEI
 }
 
 jar {
@@ -111,6 +112,8 @@ dependencies {
     implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     implementation fg.deobf("curse.maven:guideme-1173950:6489464")
+    compileOnly "mezz.jei:jei-1.20.1-forge-api:15.20.0.106"
+    runtimeOnly(fg.deobf("mezz.jei:jei-1.20.1-forge:15.20.0.106"))
 }
 
 mixin {

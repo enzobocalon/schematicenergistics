@@ -73,10 +73,42 @@ public class PacketHandler {
                 ReturnToTerminalPacket::decode,
                 ReturnToTerminalPacket::handle
         );
+
+        CHANNEL.registerMessage(
+                nextId(), MaterialListClientPacket.class,
+                MaterialListClientPacket::toNetwork,
+                MaterialListClientPacket::fromNetwork,
+                MaterialListClientPacket::handle
+        );
+
+        CHANNEL.registerMessage(
+                nextId(), MaterialListSubscribePacket.class,
+                MaterialListSubscribePacket::toNetwork,
+                MaterialListSubscribePacket::fromNetwork,
+                MaterialListSubscribePacket::handle
+        );
+
+        CHANNEL.registerMessage(
+                nextId(), OpenMaterialsScreenPacket.class,
+                OpenMaterialsScreenPacket::toNetwork,
+                OpenMaterialsScreenPacket::fromNetwork,
+                OpenMaterialsScreenPacket::handle
+        );
+
+        CHANNEL.registerMessage(
+                nextId(), ReturnToCannonInterfacePacket.class,
+                ReturnToCannonInterfacePacket::toNetwork,
+                ReturnToCannonInterfacePacket::fromNetwork,
+                ReturnToCannonInterfacePacket::handle
+        );
     }
 
     public static <MSG> void sendToServer(MSG message) {
         CHANNEL.sendToServer(message);
+    }
+
+    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), message);
     }
 
     public static <MSG> void sendToClient(MSG message, ServerPlayer player) {

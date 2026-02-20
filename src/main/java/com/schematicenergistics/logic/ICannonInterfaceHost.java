@@ -16,4 +16,8 @@ public interface ICannonInterfaceHost {
     default void openMenu(Player player, MenuLocator locator) {
         MenuOpener.open(Registration.CANNON_INTERFACE_MENU.get(), player, locator);
     }
+
+    default void openMaterialsMenu(Player player, MenuLocator locator) {
+        MenuOpener.open(Registration.MATERIALS_MENU.get(), player, locator);
+    }
 }
