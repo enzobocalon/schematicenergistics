@@ -69,13 +69,6 @@ public class MaterialsScreen extends AEBaseScreen<MaterialsMenu> {
         scrollbar.setRange(0, maxScroll, 1);
     }
 
-    public void onReturn() {
-        var be = menu.getBlockEntity();
-        if (be != null) {
-            PacketHandler.sendToServer(new ReturnToCannonInterfacePacket(be.getBlockPos()));
-        }
-    }
-
     @Override
     public void render(GuiGraphics gfx, int mouseX, int mouseY, float partialTick) {
         super.render(gfx, mouseX, mouseY, partialTick);
@@ -85,6 +78,13 @@ public class MaterialsScreen extends AEBaseScreen<MaterialsMenu> {
 
         if (!hoveredStack.isEmpty()) {
             gfx.renderTooltip(this.font, hoveredStack, mouseX, mouseY);
+        }
+    }
+
+    public void onReturn() {
+        var pos = menu.getHostPos();
+        if (pos != null) {
+            PacketHandler.sendToServer(new ReturnToCannonInterfacePacket(pos));
         }
     }
 

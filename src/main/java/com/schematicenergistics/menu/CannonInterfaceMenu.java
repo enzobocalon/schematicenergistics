@@ -5,6 +5,7 @@ import appeng.menu.AEBaseMenu;
 import com.schematicenergistics.core.Registration;
 import com.schematicenergistics.logic.CannonInterfaceLogic;
 import com.schematicenergistics.logic.ICannonInterfaceHost;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -35,6 +36,18 @@ public class CannonInterfaceMenu extends AEBaseMenu {
     public ICannonInterfaceHost getHost() {
         return this.host;
     };
+
+    public BlockPos getHostPos() {
+        var entity = this.getHost().getEntity();
+        var part = this.getHost().getPart();
+
+        if (entity != null) {
+            return entity.getBlockPos();
+        } else if (part != null && part.getHost() != null && part.getHost().getBlockEntity() != null) {
+            return part.getHost().getBlockEntity().getBlockPos();
+        }
+        return null;
+    }
 
     @Override
     public BlockEntity getBlockEntity() {

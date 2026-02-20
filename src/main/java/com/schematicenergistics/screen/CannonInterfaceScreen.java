@@ -167,9 +167,9 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                 Component.translatable("gui.schematicenergistics.cannon_interface.materials"),
                 Component.empty(),
                 btn -> {
-                    var be = menu.getBlockEntity();
-                    if (be != null) {
-                        PacketHandler.sendToServer(new OpenMaterialsScreenPacket(be.getBlockPos()));
+                    var pos = menu.getHostPos();
+                    if (pos != null) {
+                        PacketHandler.sendToServer(new OpenMaterialsScreenPacket(pos));
                     }
                 });
         materialsButton.setPosition(leftPos + 8, this.topPos + 56);

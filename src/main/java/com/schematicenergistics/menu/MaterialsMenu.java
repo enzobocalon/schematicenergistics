@@ -11,6 +11,7 @@ import com.schematicenergistics.network.PacketHandler;
 import com.schematicenergistics.network.payloads.MaterialListClientPacket;
 import com.simibubi.create.content.schematics.cannon.MaterialChecklist;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
@@ -36,6 +37,18 @@ public class MaterialsMenu extends AEBaseMenu {
 
     public ICannonInterfaceHost getHost() {
         return this.host;
+    }
+
+    public BlockPos getHostPos() {
+        var entity = this.getHost().getEntity();
+        var part = this.getHost().getPart();
+
+        if (entity != null) {
+            return entity.getBlockPos();
+        } else if (part != null && part.getHost() != null && part.getHost().getBlockEntity() != null) {
+            return part.getHost().getBlockEntity().getBlockPos();
+        }
+        return null;
     }
 
     @Override
