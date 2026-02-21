@@ -60,6 +60,11 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
         return checklist;
     }
 
+    @Override
+    public void schematicenergistics$setCannonInterface(CannonInterfaceLogic logic) {
+        this.schematicenergistics$cannonInterface = logic;
+    }
+
     @Inject(method = "updateChecklist", at = @At("TAIL"))
     private void afterUpdateChecklist(CallbackInfo ci) {
         if (this.checklist instanceof IMaterialChecklistAccessor accessor) {
