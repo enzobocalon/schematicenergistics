@@ -54,6 +54,13 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
     @PartModels
     private static final ResourceLocation MODEL_INTERFACE = new ResourceLocation(SchematicEnergistics.MOD_ID, "part/cannon_interface");
 
+    @Override
+    public void addToWorld() {
+        super.addToWorld();
+        if (!getLevel().isClientSide()) {
+            getLogic().findAndLinkCannon(getHost().getBlockEntity().getBlockPos());
+        }
+    }
 
     @Override
     public void getBoxes(IPartCollisionHelper bch) {

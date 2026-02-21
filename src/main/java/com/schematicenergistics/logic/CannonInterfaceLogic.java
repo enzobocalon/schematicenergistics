@@ -20,6 +20,7 @@ import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.schematicenergistics.lib.CraftingHelper;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -426,6 +427,28 @@ public class CannonInterfaceLogic {
         if (grid == null) return null;
 
         return grid.getCraftingService();
+    }
+
+    /**
+     * Attempts to find and link a {@link SchematicannonBlockEntity} adjacent to the given position.
+     *
+     * <p>Allows the Interface to initiate the connection (Interface → Cannon)
+     * instead of relying solely on the Cannon. </p>
+     *
+     * @param pos the position used as reference to search for adjacent Cannons
+     */
+    public void findAndLinkCannon(BlockPos pos) {
+        Level level = getLevel();
+        if (level == null) return;
+
+        for (Direction dir : Direction.values()) {
+            BlockEntity be = level.getBlockEntity(pos.relative(dir));
+            if (be instanceof SchematicannonBlockEntity cannon) {
+                ((ISchematicAccessor) cannon).schematicenergistics$setCannonInterface(this);
+                setLinkedCannon(cannon);
+                return;
+            }
+        }
     }
 
     private boolean startPreCrafting() {
