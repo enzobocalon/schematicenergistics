@@ -77,13 +77,11 @@ public class MaterialsMenu extends AEBaseMenu {
     private List<MaterialListEntry> buildMaterialsList() {
         var logic = getLogic();
         if (logic == null) {
-            System.out.println("logic null?");
             return List.of();
         }
 
         var gridNode = logic.getGridNode();
         if (gridNode == null || gridNode.getGrid() == null) {
-            System.out.println("grid null?");
             return List.of();
         }
 
@@ -91,19 +89,16 @@ public class MaterialsMenu extends AEBaseMenu {
         var storage = grid.getStorageService().getInventory();
         var craftingService = grid.getCraftingService();
         if (storage == null || craftingService == null) {
-            System.out.println("storage ou service null?");
             return List.of();
         }
 
         var cannon = logic.getLinkedCannon();
         if (!(cannon instanceof ISchematicAccessor accessor)) {
-            System.out.println("nao achou canhao?");
             return List.of();
         }
 
         MaterialChecklist checklist = accessor.schematicenergistics$getChecklist();
         if (checklist == null) {
-            System.out.println("checklist null?");
             return List.of();
         }
 
