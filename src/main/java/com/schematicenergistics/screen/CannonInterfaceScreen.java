@@ -2,6 +2,7 @@ package com.schematicenergistics.screen;
 import appeng.api.stacks.AEItemKey;
 import appeng.client.gui.AEBaseScreen;
 import appeng.client.gui.style.ScreenStyle;
+import com.schematicenergistics.network.payloads.OpenMaterialsScreenPacket;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.schematicenergistics.lib.CannonInterfaceClientState;
 import com.schematicenergistics.lib.SEUtils;
@@ -36,6 +37,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
 
     private BlockPos terminal = null;
     private SESimpleIconButton backButton = null;
+    private SESimpleIconButton materialsButton = null;
 
     private static final int MAX_TEXT_WIDTH = 164;
 
@@ -159,6 +161,19 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         backButton.setPosition(leftPos + imageWidth - 28, this.topPos - 10);
         backButton.visible = (terminal != null);
         this.addRenderableWidget(backButton);
+
+        materialsButton = new SESimpleIconButton(
+                SEIcon.MATERIALS,
+                Component.translatable("gui.schematicenergistics.cannon_interface.materials"),
+                Component.empty(),
+                btn -> {
+                    var pos = menu.getHostPos();
+                    if (pos != null) {
+                        PacketHandler.sendToServer(new OpenMaterialsScreenPacket(pos));
+                    }
+                });
+        materialsButton.setPosition(leftPos + 8, this.topPos + 56);
+        this.addRenderableWidget(materialsButton);
     }
 
     public void sendState(String config, boolean state) {

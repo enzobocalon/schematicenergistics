@@ -13,6 +13,7 @@ import com.schematicenergistics.SchematicEnergistics;
 import com.schematicenergistics.logic.ICannonInterfaceHost;
 import com.schematicenergistics.menu.CannonInterfaceMenu;
 import com.schematicenergistics.menu.CannonInterfaceTerminalMenu;
+import com.schematicenergistics.menu.MaterialsMenu;
 import com.schematicenergistics.part.CannonInterfaceTerminal;
 import com.schematicenergistics.part.CannonInterfaceTerminalPartItem;
 import net.minecraft.world.inventory.MenuType;
@@ -83,6 +84,10 @@ public class Registration {
     public static final RegistryObject<MenuType<CannonInterfaceTerminalMenu>> CANNON_INTERFACE_TERMINAL_MENU =
             MENUS.register("cannon_interface_terminal", () -> MenuTypeBuilder.create(CannonInterfaceTerminalMenu::new, IMonitorPart.class)
                     .build("cannon_interface_terminal"));
+
+    public static final RegistryObject<MenuType<MaterialsMenu>> MATERIALS_MENU =
+            MENUS.register("materials_menu", () -> MenuTypeBuilder.create(MaterialsMenu::new, ICannonInterfaceHost.class)
+                    .build("materials_menu"));
 
     public static void init(IEventBus eventBus) {
         ITEMS.register(eventBus);

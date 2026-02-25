@@ -5,6 +5,7 @@ import appeng.api.parts.IPartHost;
 import appeng.api.stacks.AEItemKey;
 import com.schematicenergistics.blockentity.CannonInterfaceEntity;
 import com.schematicenergistics.lib.ISchematicAccessor;
+import com.schematicenergistics.logic.IMaterialChecklistAccessor;
 import com.simibubi.create.content.schematics.cannon.MaterialChecklist;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
 import com.simibubi.create.content.schematics.cannon.SchematicannonInventory;
@@ -52,6 +53,18 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
     public MaterialChecklist schematicenergistics$getChecklist() {
         updateChecklist();
         return checklist;
+    }
+
+    @Override
+    public void schematicenergistics$setCannonInterface(CannonInterfaceLogic logic) {
+        this.schematicenergistics$cannonInterface = logic;
+    }
+
+    @Inject(method = "updateChecklist", at = @At("TAIL"), remap = false)
+    private void afterUpdateChecklist(CallbackInfo ci) {
+        if (this.checklist instanceof IMaterialChecklistAccessor accessor) {
+            accessor.schematicenergistics$setLogic(this.schematicenergistics$cannonInterface);
+        }
     }
 
     @Inject(

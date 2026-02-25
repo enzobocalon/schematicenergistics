@@ -4,6 +4,7 @@ import appeng.api.util.AEColor;
 import appeng.client.render.StaticItemColor;
 import appeng.init.client.InitScreens;
 import com.schematicenergistics.core.Registration;
+import com.schematicenergistics.screen.MaterialsScreen;
 import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -73,6 +74,12 @@ public class SchematicEnergistics {
                         Registration.CANNON_INTERFACE_TERMINAL_MENU.get(),
                         CannonInterfaceTerminalScreen::new,
                         "/screens/cannon_interface_terminal.json"
+                );
+
+                InitScreens.register(
+                        Registration.MATERIALS_MENU.get(),
+                        MaterialsScreen::new,
+                        "/screens/materials.json"
                 );
             });
         }

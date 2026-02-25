@@ -54,6 +54,16 @@ public class CannonInterfaceEntity extends AENetworkBlockEntity implements IGrid
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && !level.isClientSide()) {
+            if (getLogic() != null) {
+                getLogic().findAndLinkCannon(getBlockPos());
+            }
+        }
+    }
+
+    @Override
     public void loadTag(CompoundTag data) {
         super.loadTag(data);
         this.gunpowderState = data.getBoolean("gunpowderState");
