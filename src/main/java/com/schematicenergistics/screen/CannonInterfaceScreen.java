@@ -146,7 +146,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
                                 new OpenMaterialsScreenPacket(pos));
                     }
                 });
-        materialsButton.setPosition(leftPos + 8, this.topPos + 56);
+        materialsButton.setPosition(leftPos + 9, this.topPos + 56); // 8px + 1px for the dark outer border
         this.addRenderableWidget(materialsButton);
     }
 
