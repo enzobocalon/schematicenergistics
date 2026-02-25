@@ -1,0 +1,43 @@
+{
+  "$schema": "schema.json",
+  "includes": [
+    "common/common.json"
+  ],
+  "background": {
+    "texture": "guis/materials_bg.png",
+    "srcRect": [0, 0, 176, 164]
+  },
+  "text": {
+    "dialog_title": {
+      "text": {
+        "translate": "gui.schematicenergistics.cannon_interface.materials_title"
+      },
+      "position": {
+        "left": 8,
+        "top": 5
+      }
+    }
+  },
+  "widgets": {
+    "scrollbar": {
+      "left": 161,
+      "top": 20,
+      "width": 12,
+      "height": 132
+    }
+  },
+  "images": {
+    "materialRow": {
+      "texture": "guis/materials_bg.png",
+      "textureWidth": 256,
+      "textureHeight": 256,
+      "srcRect": [0, 164, 152, 22]
+    },
+    "materialRowHover": {
+      "texture": "guis/materials_bg.png",
+      "textureWidth": 256,
+      "textureHeight": 256,
+      "srcRect": [0, 186, 152, 22]
+    }
+  }
+}

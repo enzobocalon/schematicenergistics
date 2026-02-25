@@ -83,6 +83,14 @@ public class CannonInterfacePart extends AEBasePart implements IGridTickable, IC
     }
 
     @Override
+    public void addToWorld() {
+        super.addToWorld();
+        if (!getLevel().isClientSide()) {
+            getLogic().findAndLinkCannon(getHost().getBlockEntity().getBlockPos());
+        }
+    }
+
+    @Override
     public void getBoxes(IPartCollisionHelper bch) {
         bch.addBox(2.0, 2.0, 14.0, 14.0, 14.0, 16.0);
         bch.addBox(5.0, 5.0, 12.0, 11.0, 11.0, 14.0);

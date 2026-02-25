@@ -5,6 +5,7 @@ import appeng.menu.AEBaseMenu;
 import com.schematicenergistics.core.Registration;
 import com.schematicenergistics.logic.CannonInterfaceLogic;
 import com.schematicenergistics.logic.ICannonInterfaceHost;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Inventory;
@@ -41,6 +42,18 @@ public class CannonInterfaceMenu extends AEBaseMenu {
         return super.getBlockEntity();
     }
 
+    public BlockPos getHostPos() {
+        var entity = this.getHost().getEntity();
+        var part = this.getHost().getPart();
+
+        if (entity != null) {
+            return entity.getBlockPos();
+        } else if (part != null && part.getHost() != null && part.getHost().getBlockEntity() != null) {
+            return part.getHost().getBlockEntity().getBlockPos();
+        }
+        return null;
+    }
+
     public void sendState() {
         if (getPlayer() instanceof ServerPlayer player) {
             boolean currentGunpowderState = getGunpowderState();
@@ -52,9 +65,7 @@ public class CannonInterfaceMenu extends AEBaseMenu {
                             currentGunpowderState,
                             currentCraftingState,
                             currentGunpowderCraftingState,
-                            currentBulkCraftState
-                    )
-            );
+                            currentBulkCraftState));
 
         }
     }
@@ -138,8 +149,6 @@ public class CannonInterfaceMenu extends AEBaseMenu {
         if (getPlayer() instanceof ServerPlayer player && getLogic() != null) {
             this.clientItem = getLogic().getItem();
 
-            // Send the CannonInterfaceSyncPacket to the player
-
             var item = clientItem != null && !clientItem.toStack().isEmpty()
                     ? clientItem.toTag(getLogic().getLevel().registryAccess())
                     : new CompoundTag();
@@ -165,19 +174,15 @@ public class CannonInterfaceMenu extends AEBaseMenu {
                                 name,
                                 statusMsg,
                                 state,
-                                terminal
-                        ));
+                                terminal));
             } else {
                 PacketDistributor.sendToPlayer(player,
                         new CannonInterfaceSyncPacket(
                                 item,
                                 name,
                                 statusMsg,
-                                state
-                        ));
+                                state));
             }
-
         }
     }
-
 }

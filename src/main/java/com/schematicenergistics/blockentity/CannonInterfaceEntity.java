@@ -92,6 +92,16 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
         }
     }
 
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (!level.isClientSide()) {
+            if (getLogic() != null) {
+                getLogic().findAndLinkCannon(getBlockPos());
+            }
+        }
+    }
+
     public CannonInterfaceLogic getLogic() {
         return this.cannonLogic;
     }
