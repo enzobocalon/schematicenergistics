@@ -1,5 +1,6 @@
 package com.schematicenergistics.screen;
 
+import appeng.api.stacks.AEItemKey;
 import appeng.client.gui.AEBaseScreen;
 import appeng.client.gui.style.ScreenStyle;
 import com.simibubi.create.content.schematics.cannon.SchematicannonBlockEntity;
@@ -11,6 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.PacketDistributor;
 import com.schematicenergistics.network.payloads.CannonInterfaceConfigPacket;
 import com.schematicenergistics.network.payloads.CannonStatePacket;
@@ -32,6 +34,7 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     private SEToggleButton playPause;
     private SESimpleIconButton backButton = null;
     private SESimpleIconButton materialsButton = null;
+    private AEItemKey item;
 
     private boolean craftingState;
     private boolean gunpowderState;
@@ -170,6 +173,27 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
         PacketDistributor.sendToServer(new CannonStatePacket(cannonState.toString()));
     }
 
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        int centerX = this.leftPos + 147;
+        int centerY = this.topPos + 22;
+
+        if (this.item != null && !this.item.toStack().isEmpty()) {
+            guiGraphics.renderItem(this.item.toStack(), centerX, centerY);
+        }
+
+        if (mouseX >= centerX && mouseX < centerX + 16 && mouseY >= centerY && mouseY < centerY + 16) {
+            if (this.item == null || this.item.toStack().isEmpty()) {
+                guiGraphics.renderTooltip(this.font,
+                        Component.translatable("gui.schematicenergistics.cannon_interface.no_item"), mouseX, mouseY);
+            } else {
+                guiGraphics.renderTooltip(this.font, this.item.getDisplayName(), mouseX, mouseY);
+            }
+        }
+    }
+
+
     // -----------------------------------------------------------------------
     // State updates
     // -----------------------------------------------------------------------
@@ -206,6 +230,9 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     public void updateScreenItem(CompoundTag data, String schematicName, String statusMsg,
             String state, BlockPos terminalPos) {
         this.terminal = terminalPos;
+        var item = AEItemKey.fromTag(menu.getLogic().getLevel().registryAccess(), data);
+        this.item = item != null ? item : AEItemKey.of(ItemStack.EMPTY);
+
         if (backButton != null) backButton.visible = (terminal != null);
         updateSchematicName(schematicName);
         updateStatusMsg(statusMsg);
