@@ -106,11 +106,7 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
             }
         }
 
-        if (logicalHost != null) {
-            this.schematicenergistics$cannonInterface = logicalHost;
-        } else {
-            this.schematicenergistics$cannonInterface = null;
-        }
+        this.schematicenergistics$cannonInterface = logicalHost;
     }
 
     @Inject(

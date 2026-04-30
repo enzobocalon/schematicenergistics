@@ -84,10 +84,15 @@ public class CannonInterfaceLogic {
 
     public ImmutableSet<ICraftingLink> getRequestedJobs() {
         ImmutableSet.Builder<ICraftingLink> builder = ImmutableSet.builder();
-        if (this.craftingHelper.getLink() != null)
+
+        if (this.craftingHelper.getLink() != null) {
             builder.add(this.craftingHelper.getLink());
-        if (this.gunpowderCraftingHelper.getLink() != null)
+        }
+
+        if (this.gunpowderCraftingHelper.getLink() != null) {
             builder.add(this.gunpowderCraftingHelper.getLink());
+        }
+
         for (CraftingHelper helper : pendingCraftingJobs.values()) {
             if (helper.getLink() != null) {
                 builder.add(helper.getLink());
@@ -98,8 +103,7 @@ public class CannonInterfaceLogic {
 
 
     public long insertCraftedItems(ICraftingLink link, AEKey what, long amount, Actionable mode) {
-        if (!(what instanceof AEItemKey))
-            return 0;
+        if (!(what instanceof AEItemKey)) return 0;
 
         boolean isKnownLink = link.equals(this.craftingHelper.getLink())
                 || link.equals(this.gunpowderCraftingHelper.getLink());
@@ -117,8 +121,10 @@ public class CannonInterfaceLogic {
             return 0;
 
         if (node == null) return 0;
+
         var grid = node.getGrid();
         if (grid == null) return 0;
+
         MEStorage inventory = grid.getStorageService().getInventory();
         if (inventory == null) return 0;
 
@@ -175,6 +181,7 @@ public class CannonInterfaceLogic {
         if (!craftingService.isCraftable(what)) {
             return false;
         }
+
         if (this.craftingHelper.getPendingCraft() == null) {
             this.craftingHelper.startCraft(what, amount, CalculationStrategy.REPORT_MISSING_ITEMS);
         }
@@ -186,8 +193,10 @@ public class CannonInterfaceLogic {
     public int refill(int amount) {
         if (!this.gunpowderState) return 0;
         if (node == null) return 0;
+
         var grid = node.getGrid();
         if (grid == null) return 0;
+
         MEStorage inventory = grid.getStorageService().getInventory();
         AEItemKey gunpowderKey = AEItemKey.of(Items.GUNPOWDER);
         long available = inventory.getAvailableStacks().get(gunpowderKey);
