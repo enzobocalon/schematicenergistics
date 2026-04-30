@@ -105,11 +105,7 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
             }
         }
 
-        if (logicalHost != null) {
-            this.schematicenergistics$cannonInterface = logicalHost;
-        } else {
-            this.schematicenergistics$cannonInterface = null;
-        }
+        this.schematicenergistics$cannonInterface = logicalHost;
     }
 
     @Inject(method = { "grabItemsFromAttachedInventories" }, at = { @At("TAIL") }, cancellable = true)
@@ -128,11 +124,12 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
 
     @Inject(method = { "tickPrinter" }, at = { @At("HEAD") })
     protected void tickPrinter(CallbackInfo ci) {
-        if (this.schematicenergistics$cannonInterface == null)
-            return;
-        var blueprint = inventory.getStackInSlot(0);
+        if (this.schematicenergistics$cannonInterface == null) return;
+
+        ItemStack blueprint = inventory.getStackInSlot(0);
         this.schematicenergistics$cannonInterface.setStatusMsg(statusMsg);
         this.schematicenergistics$cannonInterface.setState(state.toString());
+
         if (!blueprint.isEmpty()) {
             this.schematicenergistics$cannonInterface.setSchematicName(blueprint.get(AllDataComponents.SCHEMATIC_FILE));
         } else {
@@ -141,7 +138,7 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
         }
 
         if (missingItem != null) {
-            var key = AEItemKey.of(missingItem);
+            AEItemKey key = AEItemKey.of(missingItem);
             if (key != this.schematicenergistics$cannonInterface.getItem()) {
                 this.schematicenergistics$cannonInterface.setItem(key);
             }
