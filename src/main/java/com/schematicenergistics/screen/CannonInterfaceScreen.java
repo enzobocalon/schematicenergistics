@@ -27,7 +27,6 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     private final SEToggleButton toggleCrafting;
     private final SEToggleButton toggleGunpowder;
     private final SEToggleButton toggleBulkCraft;
-    private SESimpleIconButton stop;
     private SEToggleButton playPause;
 
     private boolean craftingState;
@@ -54,60 +53,29 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
             CannonInterfaceClientState.reset();
         }
 
-        this.toggleBulkCraft = new SEToggleButton(
-                SEIcon.BULK_CRAFT_ALLOW,
-                SEIcon.BULK_CRAFT_DENY,
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_bulk_craft"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_bulk_craft_hint"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_bulk_craft"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_bulk_craft_hint"),
-                state -> sendState("bulkCraftState", state),
-                bulkCraftState
-        );
+        this.toggleBulkCraft = CannonInterfaceButtons.toolbarToggle(
+                SEIcon.BULK_CRAFT_ALLOW, SEIcon.BULK_CRAFT_DENY,
+                "disable_bulk_craft", "enable_bulk_craft",
+                state -> sendState("bulkCraftState", state), bulkCraftState,
+                this::addToLeftToolbar);
 
-        this.toggleCrafting = new SEToggleButton(
-                SEIcon.CRAFTING_ALLOW,
-                SEIcon.CRAFTING_DENY,
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_autocraft"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_autocraft_hint"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_autocraft"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_autocraft_hint"),
-                state -> {
-                    sendState("craftingState", state);
-                },
-                craftingState
-        );
+        this.toggleCrafting = CannonInterfaceButtons.toolbarToggle(
+                SEIcon.CRAFTING_ALLOW, SEIcon.CRAFTING_DENY,
+                "disable_autocraft", "enable_autocraft",
+                state -> sendState("craftingState", state), craftingState,
+                this::addToLeftToolbar);
 
-        this.toggleGunpowder = new SEToggleButton(
-                SEIcon.GUNPOWDER_ALLOW,
-                SEIcon.GUNPOWDER_DENY,
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_hint"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_gunpowder"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_gunpowder_hint"),
-                state -> {
-                    sendState("gunpowderState", state);
-                },
-                gunpowderState
-        );
+        this.toggleGunpowder = CannonInterfaceButtons.toolbarToggle(
+                SEIcon.GUNPOWDER_ALLOW, SEIcon.GUNPOWDER_DENY,
+                "disable_gunpowder", "enable_gunpowder",
+                state -> sendState("gunpowderState", state), gunpowderState,
+                this::addToLeftToolbar);
 
-        this.toggleGunpowderCrafting = new SEToggleButton(
-                SEIcon.GUNPOWDER_CRAFTING_ALLOW,
-                SEIcon.GUNPOWDER_CRAFTING_DENY,
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting_hint"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_gunpowder_crafting"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.enable_gunpowder_crafting_hint"),
-                state -> {
-                    sendState("gunpowderCraftingState", state);
-                },
-                gunpowderCraftingState
-        );
-
-        this.addToLeftToolbar(toggleBulkCraft);
-        this.addToLeftToolbar(toggleCrafting);
-        this.addToLeftToolbar(toggleGunpowder);
-        this.addToLeftToolbar(toggleGunpowderCrafting);
+        this.toggleGunpowderCrafting = CannonInterfaceButtons.toolbarToggle(
+                SEIcon.GUNPOWDER_CRAFTING_ALLOW, SEIcon.GUNPOWDER_CRAFTING_DENY,
+                "disable_gunpowder_crafting", "enable_gunpowder_crafting",
+                state -> sendState("gunpowderCraftingState", state), gunpowderCraftingState,
+                this::addToLeftToolbar);
 
     }
 
@@ -118,62 +86,44 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
 
         int centerX = this.leftPos + (this.imageWidth / 2) - 8;
 
-        this.playPause = new SEToggleButton(
-                SEIcon.PAUSE,
-                SEIcon.PLAY,
-                Component.translatable("gui.schematicenergistics.cannon_interface.pause"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.pause_hint"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.play"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.play_hint"),
-                (state) -> sendCannonState(state, false),
-                false
-        );
+        this.playPause = CannonInterfaceButtons.positionedToggle(
+                SEIcon.PAUSE, SEIcon.PLAY,
+                "pause", "play",
+                state -> sendCannonState(state, false), false,
+                centerX - 16, this.topPos + 56,
+                this::addRenderableWidget);
 
-        this.playPause.setPosition(
-                centerX - 16,
-                this.topPos + 56
-        );
-
-        this.addRenderableWidget(playPause);
-
-        this.stop = new SESimpleIconButton(
+        CannonInterfaceButtons.iconButton(
                 SEIcon.STOP,
-                Component.translatable("gui.schematicenergistics.cannon_interface.stop"),
-                Component.translatable("gui.schematicenergistics.cannon_interface.stop_hint"),
-                (btn) -> sendCannonState(false, true)
-        );
+                CannonInterfaceButtons.cannonInterfaceText("stop"),
+                CannonInterfaceButtons.cannonInterfaceText("stop_hint"),
+                btn -> sendCannonState(false, true),
+                centerX + 16, this.topPos + 56,
+                this::addRenderableWidget);
 
-        this.stop.setPosition(
-                centerX + 16,
-                this.topPos + 56
-        );
-
-        this.addRenderableWidget(stop);
-
-        this.backButton = new SESimpleIconButton(
+        this.backButton = CannonInterfaceButtons.iconButton(
                 SEIcon.BACK,
                 Component.translatable("gui.schematicenergistics.cannon_terminal.return_terminal"),
                 Component.empty(),
                 (btn) -> {
                     PacketHandler.sendToServer(new ReturnToTerminalPacket(terminal));
-                }
-        );
-        backButton.setPosition(leftPos + imageWidth - 28, this.topPos - 10);
+                },
+                leftPos + imageWidth - 28, this.topPos - 10,
+                this::addRenderableWidget);
         backButton.visible = (terminal != null);
-        this.addRenderableWidget(backButton);
 
-        materialsButton = new SESimpleIconButton(
+        materialsButton = CannonInterfaceButtons.iconButton(
                 SEIcon.MATERIALS,
-                Component.translatable("gui.schematicenergistics.cannon_interface.materials"),
+                CannonInterfaceButtons.cannonInterfaceText("materials"),
                 Component.empty(),
                 btn -> {
                     var pos = menu.getHostPos();
                     if (pos != null) {
                         PacketHandler.sendToServer(new OpenMaterialsScreenPacket(pos));
                     }
-                });
-        materialsButton.setPosition(leftPos + 8, this.topPos + 56);
-        this.addRenderableWidget(materialsButton);
+                },
+                leftPos + 8, this.topPos + 56,
+                this::addRenderableWidget);
     }
 
     public void sendState(String config, boolean state) {
@@ -223,6 +173,8 @@ public class CannonInterfaceScreen extends AEBaseScreen<CannonInterfaceMenu> {
     public void updateStates(boolean gunpowderState, boolean craftingState, boolean gunpowderCraftingState, boolean bulkCraftState) {
         this.gunpowderState = gunpowderState;
         this.craftingState = craftingState;
+        this.gunpowderCraftingState = gunpowderCraftingState;
+        this.bulkCraftState = bulkCraftState;
 
         if (this.toggleGunpowder != null) {
             this.toggleGunpowder.setState(gunpowderState);
