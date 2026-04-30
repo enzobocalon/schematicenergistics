@@ -83,7 +83,7 @@ public class CannonInterfaceEntity extends AENetworkedBlockEntity implements IGr
                     this.getMainNode(),
                     this.actionSource,
                     this
-                    );
+            );
 
             this.cannonLogic.setGunpowderState(this.gunpowderState);
             this.cannonLogic.setCraftingState(this.craftingState);

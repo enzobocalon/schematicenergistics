@@ -130,16 +130,20 @@ public class CannonInterfaceLogic {
 
     public ImmutableSet<ICraftingLink> getRequestedJobs() {
         ImmutableSet.Builder<ICraftingLink> builder = ImmutableSet.builder();
-        if (this.craftingHelper.getLink() != null)
+
+        if (this.craftingHelper.getLink() != null) {
             builder.add(this.craftingHelper.getLink());
-        if (this.gunpowderCraftingHelper.getLink() != null)
+        }
+
+        if (this.gunpowderCraftingHelper.getLink() != null) {
             builder.add(this.gunpowderCraftingHelper.getLink());
+        }
+
         return builder.build();
     }
 
     public long insertCraftedItems(ICraftingLink link, AEKey what, long amount, Actionable mode) {
-        if (!(what instanceof AEItemKey))
-            return 0;
+        if (!(what instanceof AEItemKey)) return 0;
 
         boolean isKnownLink = link.equals(this.craftingHelper.getLink()) ||
                 link.equals(this.gunpowderCraftingHelper.getLink());
@@ -157,11 +161,11 @@ public class CannonInterfaceLogic {
             return 0;
         }
 
-        if (node == null)
-            return 0;
+        if (node == null) return 0;
+
         var grid = node.getGrid();
-        if (grid == null)
-            return 0;
+        if (grid == null) return 0;
+
         MEStorage inventory = grid.getStorageService().getInventory();
         if (inventory == null)
             return 0;
@@ -191,17 +195,14 @@ public class CannonInterfaceLogic {
     }
 
     public boolean request(AEItemKey what, long amount, boolean simulate) {
-        if (node == null)
-            return false;
+        if (node == null) return false;
 
         var grid = node.getGrid();
-        if (grid == null)
-            return false;
+        if (grid == null) return false;
 
         var inventory = grid.getStorageService().getInventory();
         var craftingService = grid.getCraftingService();
-        if (inventory == null || craftingService == null)
-            return false;
+        if (inventory == null || craftingService == null) return false;
 
         long available = inventory.getAvailableStacks().get(what);
         if (available >= amount) {
@@ -211,16 +212,13 @@ public class CannonInterfaceLogic {
             return true;
         }
 
-        if (!this.craftingState)
-            return false;
+        if (!this.craftingState) return false;
 
-        if (this.craftingHelper.getLink() != null) {
-            return false;
-        }
+        if (this.craftingHelper.getLink() != null) return false;
 
-        if (!craftingService.isCraftable(what)) {
-            return false;
-        }
+
+        if (!craftingService.isCraftable(what)) return false;
+
         if (this.craftingHelper.getPendingCraft() == null) {
             this.craftingHelper.startCraft(what, amount, CalculationStrategy.REPORT_MISSING_ITEMS);
         }
@@ -237,23 +235,21 @@ public class CannonInterfaceLogic {
     }
 
     public int refill(int amount) {
-        if (!this.gunpowderState)
-            return 0;
-        if (node == null)
-            return 0;
+        if (!this.gunpowderState) return 0;
+        if (node == null) return 0;
         var grid = node.getGrid();
         if (grid == null)
             return 0;
         MEStorage inventory = grid.getStorageService().getInventory();
         AEItemKey gunpowderKey = AEItemKey.of(Items.GUNPOWDER);
         long available = inventory.getAvailableStacks().get(gunpowderKey);
+
         if (available <= 0) {
-            if (!this.gunpowderCraftingState)
-                return 0;
+            if (!this.gunpowderCraftingState) return 0;
+
             var canCraft = grid.getCraftingService().isCraftable(gunpowderKey);
-            if (!canCraft) {
-                return 0;
-            }
+            if (!canCraft) return 0;
+
             if (this.gunpowderCraftingHelper.getLink() != null
                     || this.gunpowderCraftingHelper.getPendingCraft() != null) {
                 return 0; // Already crafting
@@ -506,12 +502,11 @@ public class CannonInterfaceLogic {
             int gathered = checklist.gathered.getOrDefault(item, 0);
             int needed = required - gathered;
 
-            if (needed <= 0) {
-                continue;
-            }
+            if (needed <= 0) continue;
 
             ItemStack stack = new ItemStack(item);
             AEItemKey key = AEItemKey.of(stack);
+
             if (key != null) {
                 totalRequired.put(key, (long) needed);
             }
