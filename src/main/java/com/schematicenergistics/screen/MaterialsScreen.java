@@ -140,9 +140,9 @@ public class MaterialsScreen extends AEBaseScreen<MaterialsMenu> {
         this.materials.clear();
         var registryAccess = menu.getLogic().getLevel().registryAccess();
         for (var entry : entries) {
-            var key       = AEItemKey.fromTag(registryAccess, entry.item());
+            var key = AEItemKey.fromTag(registryAccess, entry.item());
             ItemStack stack = key != null ? key.toStack() : ItemStack.EMPTY;
-            String name   = stack.isEmpty() ? "" : limitNameLength(stack.getHoverName().getString(), 50);
+            String name = stack.isEmpty() ? "" : limitNameLength(stack.getHoverName().getString(), 50);
             this.materials.add(new MaterialRow(key, stack, name,
                     entry.available(), entry.required(), entry.gathered(), entry.craftable()));
         }
