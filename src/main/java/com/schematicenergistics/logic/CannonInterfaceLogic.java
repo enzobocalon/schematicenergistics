@@ -139,6 +139,12 @@ public class CannonInterfaceLogic {
             builder.add(this.gunpowderCraftingHelper.getLink());
         }
 
+        for (CraftingHelper helper : pendingCraftingJobs.values()) {
+            if (helper.getLink() != null) {
+                builder.add(helper.getLink());
+            }
+        }
+
         return builder.build();
     }
 
