@@ -101,16 +101,16 @@ public final class Registration {
         CANNON_INTERFACE_MENU =
                 MENUS.register("cannon_interface", () ->
                         MenuTypeBuilder.create(CannonInterfaceMenu::new, ICannonInterfaceHost.class)
-                                .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface")));
+                                .buildUnregistered(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface")));
 
         CANNON_INTERFACE_TERMINAL_MENU =
                 MENUS.register("cannon_interface_terminal", () ->
                         MenuTypeBuilder.create(CannonInterfaceTerminalMenu::new, IMonitorPart.class)
-                                .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface_terminal")));
+                                .buildUnregistered(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "cannon_interface_terminal")));
 
         MATERIALS_MENU =
                 MENUS.register("materials", () ->
                         MenuTypeBuilder.create(MaterialsMenu::new, ICannonInterfaceHost.class)
-                                .build(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "materials")));
+                                .buildUnregistered(ResourceLocation.fromNamespaceAndPath(SchematicEnergistics.MOD_ID, "materials")));
     }
 }

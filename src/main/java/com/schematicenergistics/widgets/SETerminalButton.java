@@ -1,6 +1,7 @@
 package com.schematicenergistics.widgets;
 
 import appeng.client.gui.style.Blitter;
+import appeng.client.gui.widgets.ITooltip;
 import com.schematicenergistics.core.Registration;
 import com.schematicenergistics.lib.SEUtils;
 import com.schematicenergistics.lib.TerminalListData;
@@ -8,14 +9,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
-public class SETerminalButton extends AbstractWidget {
+public class SETerminalButton extends AbstractWidget implements ITooltip {
     private final Blitter buttonBg;
     private final Blitter buttonBgSelected;
     private final Consumer<Integer> onClickCallback;
@@ -23,6 +27,7 @@ public class SETerminalButton extends AbstractWidget {
     private TerminalListData data = null;
     private int itemIndex = -1;
     private boolean isSelected = false;
+    private List<Component> tooltip = Collections.emptyList();
 
     private static final int TEXT_COLOR_NORMAL = 0x403e53;
 
@@ -37,6 +42,12 @@ public class SETerminalButton extends AbstractWidget {
 
 
     public void setButtonData(TerminalListData data, int index) {
+        if (Objects.equals(this.data, data) && this.itemIndex == index) {
+            this.visible = true;
+            this.active = true;
+            return;
+        }
+
         this.data = data;
         this.itemIndex = index;
 
@@ -56,6 +67,7 @@ public class SETerminalButton extends AbstractWidget {
         this.data = null;
         this.itemIndex = -1;
         this.isSelected = false;
+        this.tooltip = Collections.emptyList();
         this.setMessage(Component.empty());
         this.visible = false;
         this.active = false;
@@ -187,17 +199,32 @@ public class SETerminalButton extends AbstractWidget {
     }
 
     private void updateTooltip() {
-        String tooltipText;
+        Component status;
 
         if (data.status() == null || data.status().isEmpty()) {
-            tooltipText = "Status: " + Component.translatable("gui.schematicenergistics.cannon_interface.missing_cannon").getString();
+            status = Component.translatable("gui.schematicenergistics.cannon_interface.missing_cannon");
         } else if (data.schematicName() == null || data.schematicName().isEmpty()) {
-            tooltipText = "Status: " + Component.translatable("gui.schematicenergistics.cannon_interface.schematic_name").getString();
+            status = Component.translatable("gui.schematicenergistics.cannon_interface.schematic_name");
         } else {
-            tooltipText = "Status: " + SEUtils.formatCannonStatus(data.status()).getString();
+            status = SEUtils.formatCannonStatus(data.status());
         }
 
-        setTooltip(Tooltip.create(Component.literal(tooltipText)));
+        this.tooltip = List.of(Component.literal("Status: ").append(status));
+    }
+
+    @Override
+    public List<Component> getTooltipMessage() {
+        return tooltip;
+    }
+
+    @Override
+    public Rect2i getTooltipArea() {
+        return new Rect2i(getX(), getY(), getWidth(), getHeight());
+    }
+
+    @Override
+    public boolean isTooltipAreaVisible() {
+        return visible && hasData() && !tooltip.isEmpty();
     }
 
 
