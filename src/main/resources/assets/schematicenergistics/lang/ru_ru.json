@@ -1,0 +1,48 @@
+{
+  "block.schematicenergistics.cannon_interface": "МЭ интерфейс строительной пушки",
+  "item.schematicenergistics.cannon_interface_part": "МЭ интерфейс строительной пушки",
+  "item.schematicenergistics.cannon_interface_terminal": "МЭ терминал строительной пушки",
+  "block.schematicenergistics.cannon_interface.tooltip": "Позволяет строительной пушке взаимодействовать с МЭ-сетью Applied Energistics 2 (AE2) и поддерживает автокрафт.",
+  "creativetab.schematicenergistics.title": "Schematic Energistics",
+  
+  "gui.schematicenergistics.cannon_interface.title": "Интерфейс строительной пушки",
+  "gui.schematicenergistics.cannon_interface.no_item": "Нет предметов",
+  "gui.schematicenergistics.cannon_interface.disable_autocraft": "Отключить автокрафт предметов",
+  "gui.schematicenergistics.cannon_interface.enable_autocraft": "Включить автокрафт предметов",
+  "gui.schematicenergistics.cannon_interface.disable_autocraft_hint": "Отключить автокрафт для этого предмета. Пушка продолжит запрашивать предметы, но не будет пытаться запустить их создание при нехватке ресурсов.",
+  "gui.schematicenergistics.cannon_interface.enable_autocraft_hint": "Включить автокрафт для этого предмета. Если ресурсов в системе недостаточно, пушка попытается автоматически заказать их создание.",
+  
+  "gui.schematicenergistics.cannon_interface.enable_gunpowder_crafting": "Включить автокрафт пороха",
+  "gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting": "Отключить автокрафт пороха",
+  "gui.schematicenergistics.cannon_interface.enable_gunpowder_crafting_hint": "Разрешить автоматическое создание пороха. При нехватке пороха в МЭ-системе пушка запустит задачу его автокрафта.",
+  "gui.schematicenergistics.cannon_interface.disable_gunpowder_crafting_hint": "Запретить автоматическое создание пороха. При нехватке пороха в МЭ-системе пушка не будет пытаться его скрафтить.",
+  
+  "gui.schematicenergistics.cannon_interface.disable_gunpowder": "Отключить запрос пороха",
+  "gui.schematicenergistics.cannon_interface.enable_gunpowder": "Включить запрос пороха",
+  "gui.schematicenergistics.cannon_interface.disable_gunpowder_hint": "Запретить пушке запрашивать порох из МЭ-системы. Это также остановит автокрафт пороха.",
+  "gui.schematicenergistics.cannon_interface.enable_gunpowder_hint": "Разрешить пушке запрашивать порох из МЭ-системы. Функция автокрафта настраивается отдельно.",
+  
+  "gui.schematicenergistics.cannon_interface.schematic_name": "Схематика не найдена",
+  "gui.schematicenergistics.cannon_interface.missing_cannon": "Пушка отсутствует",
+  "gui.schematicenergistics.cannon_interface.pause": "Приостановить пушку",
+  "gui.schematicenergistics.cannon_interface.play": "Запустить/Возобновить пушку",
+  "gui.schematicenergistics.cannon_interface.pause_hint": "Поставить строительную пушку на паузу.",
+  "gui.schematicenergistics.cannon_interface.play_hint": "Запустить или возобновить работу строительной пушки.",
+  "gui.schematicenergistics.cannon_interface.stop": "Остановить пушку",
+  "gui.schematicenergistics.cannon_interface.stop_hint": "Полностью остановить работу строительной пушки.",
+  
+  "gui.schematicenergistics.cannon_terminal.title": "Терминал интерфейса пушки",
+  "gui.schematicenergistics.cannon_terminal.return_terminal": "Вернуться к терминалу",
+  
+  "gui.schematicenergistics.cannon_interface.enable_bulk_craft": "Включить массовое создание",
+  "gui.schematicenergistics.cannon_interface.enable_bulk_craft_hint": "Создавать предметы заранее крупными партиями. Тратит больше мощностей МЭ-процессора и может привести к избытку ресурсов.",
+  "gui.schematicenergistics.cannon_interface.disable_bulk_craft": "Отключить массовое создание",
+  "gui.schematicenergistics.cannon_interface.disable_bulk_craft_hint": "Предметы будут создаваться строго по мере необходимости поштучно.",
+  "gui.schematicenergistics.cannon_interface.bulk_craft_status": "Создание предметов...",
+  
+  "gui.schematicenergistics.cannon_interface.materials": "Материалы",
+  "gui.schematicenergistics.cannon_interface.materials_title": "Список материалов",
+  "gui.schematicenergistics.cannon_interface.materials_detail": "В наличии: %s / Нужно: %s (Собрано: %s)",
+  "gui.schematicenergistics.materials.return_interface": "Вернуться к интерфейсу пушки",
+  "gui.schematicenergistics.label.craftable": "Можно создать"
+}
