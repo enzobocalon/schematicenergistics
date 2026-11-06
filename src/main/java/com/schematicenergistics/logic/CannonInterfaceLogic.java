@@ -23,7 +23,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
@@ -180,13 +179,13 @@ public class CannonInterfaceLogic {
     }
 
     public void jobStateChange(ICraftingLink link) {
-        if (link.equals(this.craftingHelper.getLink())) {
+        if (link.equals(this.craftingHelper.getLink())) { // regular crafting
             this.craftingHelper.setLink(null);
             this.craftingHelper.clearReadyPlan();
-        } else if (link.equals(this.gunpowderCraftingHelper.getLink())) {
+        } else if (link.equals(this.gunpowderCraftingHelper.getLink())) { // gunpowder
             this.gunpowderCraftingHelper.setLink(null);
             this.gunpowderCraftingHelper.clearReadyPlan();
-        } else {
+        } else { // bulk
             Iterator<Map.Entry<AEItemKey, CraftingHelper>> it = pendingCraftingJobs.entrySet().iterator();
             while (it.hasNext()) {
                 CraftingHelper helper = it.next().getValue();
@@ -453,8 +452,8 @@ public class CannonInterfaceLogic {
     }
 
     private void cancelAllPendingCrafts() {
-
-        for (Map.Entry<AEItemKey, CraftingHelper> entry : pendingCraftingJobs.entrySet()) {
+        var pendingCraftingJobsCopy = new HashMap<>(pendingCraftingJobs).entrySet();
+        for (Map.Entry<AEItemKey, CraftingHelper> entry : pendingCraftingJobsCopy) {
             CraftingHelper helper = entry.getValue();
             if (helper.getLink() != null) {
                 try {
