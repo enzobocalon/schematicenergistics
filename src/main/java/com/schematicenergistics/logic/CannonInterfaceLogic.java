@@ -471,6 +471,7 @@ public class CannonInterfaceLogic {
             }
 
             if (helper.getPendingCraft() != null) {
+                helper.getPendingCraft().getFuture().cancel(true);
                 helper.clearPendingCraft();
             }
 
