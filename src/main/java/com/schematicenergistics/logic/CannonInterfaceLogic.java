@@ -326,6 +326,7 @@ public class CannonInterfaceLogic {
                         log.warn("Pre-crafting submit timed out for {}", entry.getKey());
                         continue;
                     }
+                    if (!helper.tryScheduleReadyPlanRetry(now)) continue;
                 }
                 var result = node.getGrid().getCraftingService().submitJob(
                         helper.getReadyPlan(),
