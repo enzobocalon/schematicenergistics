@@ -14,6 +14,7 @@ public class CraftingHelper {
     private ICraftingPlan readyPlan;
     private long readyPlanSinceTick = -1;
     private long nextReadyPlanRetryTick;
+    private long nextCalculationTick;
 
     public CraftingHelper(CannonInterfaceLogic logic) {
         this.cannonLogic = logic;
@@ -24,6 +25,7 @@ public class CraftingHelper {
         if (key == null || amount <= 0 || level == null || strategy == null) {
             return;
         }
+        if (level.getGameTime() < nextCalculationTick) return;
 
         var node = this.cannonLogic.getGridNode();
         if (node == null) return;
@@ -52,6 +54,24 @@ public class CraftingHelper {
 
     public void clearPendingCraft() {
         this.pendingCraft = null;
+    }
+
+    public void deferCalculationRetry() {
+        nextCalculationTick = cannonLogic.getLevel().getGameTime() + 20;
+    }
+
+    public void cancel() {
+        var previousLink = link;
+        var previousCraft = pendingCraft;
+        link = null;
+        pendingCraft = null;
+        clearReadyPlan();
+        nextCalculationTick = 0;
+        try {
+            if (previousCraft != null) previousCraft.getFuture().cancel(true);
+        } finally {
+            if (previousLink != null) previousLink.cancel();
+        }
     }
 
     public void setLink(ICraftingLink link) {

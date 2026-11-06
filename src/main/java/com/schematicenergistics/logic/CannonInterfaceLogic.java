@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Iterator;
 import com.schematicenergistics.util.ISchematicAccessor;
@@ -372,6 +373,8 @@ public class CannonInterfaceLogic {
                     } else {
                         helper.setReadyPlan(plan);
                     }
+                } else {
+                    helper.deferCalculationRetry();
                 }
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
@@ -437,15 +440,15 @@ public class CannonInterfaceLogic {
 
     public void setState(String state) {
         this.state = state;
+        if ("STOPPED".equals(state)) {
+            cancelAllPendingCrafts();
+            this.hasPreCrafted = false;
+            this.isPreCrafting = false;
+            this.pendingCraftingJobs.clear();
+        }
         if (bulkCraftState) {
             if (isPreCrafting) {
                 setStatusMsg("BULK_CRAFTING");
-            }
-            if ("STOPPED".equals(state)) {
-                cancelAllPendingCrafts();
-                this.hasPreCrafted = false;
-                this.isPreCrafting = false;
-                this.pendingCraftingJobs.clear();
             }
             if ("RUNNING".equals(state) && !hasPreCrafted && !isPreCrafting) {
                 if (startPreCrafting()) {
@@ -459,25 +462,14 @@ public class CannonInterfaceLogic {
     }
 
     private void cancelAllPendingCrafts() {
-        var pendingCraftingJobsCopy = new HashMap<>(pendingCraftingJobs).entrySet();
-        for (Map.Entry<AEItemKey, CraftingHelper> entry : pendingCraftingJobsCopy) {
-            CraftingHelper helper = entry.getValue();
-            if (helper.getLink() != null) {
-                try {
-                    helper.getLink().cancel();
-                } catch (Exception e) {
-                    log.error("Failed to cancel craft link for {}", entry.getKey(), e);
-                }
-                helper.setLink(null);
-            }
-
-            if (helper.getPendingCraft() != null) {
-                helper.getPendingCraft().getFuture().cancel(true);
-                helper.clearPendingCraft();
-            }
-
-            if (helper.getReadyPlan() != null) {
-                helper.clearReadyPlan();
+        var helpers = new ArrayList<>(pendingCraftingJobs.values());
+        helpers.add(craftingHelper);
+        helpers.add(gunpowderCraftingHelper);
+        for (CraftingHelper helper : helpers) {
+            try {
+                helper.cancel();
+            } catch (Exception e) {
+                log.error("Failed to cancel craft", e);
             }
         }
     }
