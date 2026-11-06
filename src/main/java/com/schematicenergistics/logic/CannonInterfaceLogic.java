@@ -210,7 +210,7 @@ public class CannonInterfaceLogic {
         var craftingService = grid.getCraftingService();
         if (inventory == null || craftingService == null) return false;
 
-        long available = inventory.getAvailableStacks().get(what);
+        long available = inventory.extract(what, amount, Actionable.SIMULATE, this.actionSource);
         if (available >= amount) {
             if (!simulate) {
                 inventory.extract(what, amount, Actionable.MODULATE, this.actionSource);
@@ -253,7 +253,7 @@ public class CannonInterfaceLogic {
 
         MEStorage inventory = grid.getStorageService().getInventory();
         AEItemKey gunpowderKey = AEItemKey.of(Items.GUNPOWDER);
-        long available = inventory.getAvailableStacks().get(gunpowderKey);
+        long available = inventory.extract(gunpowderKey, amount, Actionable.SIMULATE, this.actionSource);
 
         if (available <= 0) {
             if (!this.gunpowderCraftingState) return 0;
