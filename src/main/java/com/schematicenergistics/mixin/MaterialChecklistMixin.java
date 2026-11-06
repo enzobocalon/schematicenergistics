@@ -4,10 +4,7 @@ import com.google.common.collect.Sets;
 import com.schematicenergistics.lib.ColorHelper;
 import com.simibubi.create.content.schematics.cannon.MaterialChecklist;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
@@ -115,10 +112,11 @@ public class MaterialChecklistMixin implements IMaterialChecklistAccessor {
         MaterialChecklist self = (MaterialChecklist) (Object) this;
 
         schematicenergistics$gatheredBackup = new HashMap<>(self.gathered);
+        var availableStacks = storage.getAvailableStacks();
 
         for (Item item : Sets.union(self.required.keySet(), self.damageRequired.keySet())) {
             AEItemKey key = AEItemKey.of(new ItemStack(item));
-            long inStorage = storage.getAvailableStacks().get(key);
+            long inStorage = availableStacks.get(key);
             if (inStorage <= 0) continue;
 
             int alreadyGathered = self.gathered.getOrDefault(item, 0);

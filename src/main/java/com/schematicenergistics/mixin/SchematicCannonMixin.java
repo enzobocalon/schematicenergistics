@@ -12,7 +12,6 @@ import com.simibubi.create.content.schematics.cannon.SchematicannonInventory;
 import com.simibubi.create.content.schematics.requirement.ItemRequirement;
 import com.schematicenergistics.logic.CannonInterfaceLogic;
 import com.schematicenergistics.util.ISchematicAccessor;
-import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -27,9 +26,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import com.schematicenergistics.part.CannonInterfacePart;
-
-import java.lang.reflect.Field;
-import java.util.Collections;
 
 @Mixin({ SchematicannonBlockEntity.class })
 public abstract class SchematicCannonMixin implements ISchematicAccessor {
@@ -128,7 +124,6 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
 
         ItemStack blueprint = inventory.getStackInSlot(0);
         this.schematicenergistics$cannonInterface.setStatusMsg(statusMsg);
-        this.schematicenergistics$cannonInterface.setState(state.toString());
 
         if (!blueprint.isEmpty()) {
             this.schematicenergistics$cannonInterface.setSchematicName(blueprint.get(AllDataComponents.SCHEMATIC_FILE));
@@ -136,6 +131,7 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
             this.schematicenergistics$cannonInterface.setSchematicName(null);
             this.schematicenergistics$cannonInterface.setItem(null);
         }
+        this.schematicenergistics$cannonInterface.setState(state.toString());
 
         if (missingItem != null) {
             AEItemKey key = AEItemKey.of(missingItem);
@@ -144,7 +140,9 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
             }
         }
 
-        int maxStackSize = this.inventory.getStackInSlot(4).getMaxStackSize();
+        if (state == SchematicannonBlockEntity.State.STOPPED) return;
+
+        int maxStackSize = Items.GUNPOWDER.getDefaultMaxStackSize();
         int currentAmountOnSlot = this.inventory.getStackInSlot(4).getCount();
         if (currentAmountOnSlot >= maxStackSize)
             return;
