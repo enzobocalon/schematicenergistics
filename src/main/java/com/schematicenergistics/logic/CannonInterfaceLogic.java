@@ -545,12 +545,12 @@ public class CannonInterfaceLogic {
         }
 
         boolean startedAny = false;
-
+        var availableStacks = storage.getAvailableStacks();
         for (Map.Entry<AEItemKey, Long> entry : totalRequired.entrySet()) {
             AEItemKey key = entry.getKey();
             long needed = entry.getValue();
 
-            long available = storage.getAvailableStacks().get(key);
+            long available = availableStacks.get(key);
 
             if (available >= needed) {
                 continue;
