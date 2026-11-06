@@ -64,6 +64,7 @@ public class CannonInterfaceLogic {
     private BlockPos terminalPos = null;
 
     private SchematicannonBlockEntity cannonEntity;
+    private long lastRefillTick = Long.MIN_VALUE;
 
     public CannonInterfaceLogic(Level level, IManagedGridNode node, IActionSource actionSource,
             ICraftingRequester requester) {
@@ -245,6 +246,11 @@ public class CannonInterfaceLogic {
         var grid = node.getGrid();
         if (grid == null)
             return 0;
+
+        long currentTick = level.getGameTime();
+        if (lastRefillTick == currentTick) return 0;
+        lastRefillTick = currentTick;
+
         MEStorage inventory = grid.getStorageService().getInventory();
         AEItemKey gunpowderKey = AEItemKey.of(Items.GUNPOWDER);
         long available = inventory.getAvailableStacks().get(gunpowderKey);
