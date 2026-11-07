@@ -126,10 +126,11 @@ public class MaterialsMenu extends AEBaseMenu {
         if (required.isEmpty()) return List.of();
 
         List<MaterialListEntry> entries = new ArrayList<>(required.size());
+        var availableStacks = storage.getAvailableStacks();
         for (Map.Entry<AEItemKey, Long> entry : required.entrySet()) {
             AEItemKey key = entry.getKey();
             long needed = entry.getValue();
-            long available = storage.getAvailableStacks().get(key);
+            long available = availableStacks.get(key);
             boolean craftable = craftingService.isCraftable(key);
             int gatheredCount = gathered.getOrDefault(key, 0);
             var item = key.toTag();

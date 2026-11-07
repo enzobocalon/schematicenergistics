@@ -110,10 +110,11 @@ public class MaterialChecklistMixin implements IMaterialChecklistAccessor {
         MaterialChecklist self = (MaterialChecklist) (Object) this;
 
         schematicenergistics$gatheredBackup = new HashMap<>(self.gathered);
+        var availableStacks = storage.getAvailableStacks();
 
         for (Item item : Sets.union(self.required.keySet(), self.damageRequired.keySet())) {
             AEItemKey key = AEItemKey.of(new ItemStack(item));
-            long inStorage = storage.getAvailableStacks().get(key);
+            long inStorage = availableStacks.get(key);
             if (inStorage <= 0) continue;
 
             int alreadyGathered = self.gathered.getOrDefault(item, 0);

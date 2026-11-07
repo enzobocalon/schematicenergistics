@@ -6,13 +6,15 @@ import appeng.api.networking.crafting.ICraftingPlan;
 import appeng.api.stacks.AEItemKey;
 import com.schematicenergistics.logic.CannonInterfaceLogic;
 
-
 public class CraftingHelper {
+    private static final long SUBMIT_RETRY_DELAY_TICKS = 20;
     private CraftingRequest pendingCraft;
     private final CannonInterfaceLogic cannonLogic;
     private ICraftingLink link;
     private ICraftingPlan readyPlan;
     private long readyPlanSinceTick = -1;
+    private long nextReadyPlanRetryTick;
+    private long nextCalculationTick;
 
     public CraftingHelper(CannonInterfaceLogic logic) {
         this.cannonLogic = logic;
@@ -23,6 +25,7 @@ public class CraftingHelper {
         if (key == null || amount <= 0 || level == null || strategy == null) {
             return;
         }
+        if (level.getGameTime() < nextCalculationTick) return;
 
         var node = this.cannonLogic.getGridNode();
         if (node == null) return;
@@ -53,6 +56,24 @@ public class CraftingHelper {
         this.pendingCraft = null;
     }
 
+    public void deferCalculationRetry() {
+        nextCalculationTick = cannonLogic.getLevel().getGameTime() + 20;
+    }
+
+    public void cancel() {
+        var previousLink = link;
+        var previousCraft = pendingCraft;
+        link = null;
+        pendingCraft = null;
+        clearReadyPlan();
+        nextCalculationTick = 0;
+        try {
+            if (previousCraft != null) previousCraft.getFuture().cancel(true);
+        } finally {
+            if (previousLink != null) previousLink.cancel();
+        }
+    }
+
     public void setLink(ICraftingLink link) {
         this.link = link;
     }
@@ -69,18 +90,26 @@ public class CraftingHelper {
         return this.readyPlan;
     }
 
-    public long getReadyPlanSinceTick() {
-        return this.readyPlanSinceTick;
-    }
-
     public void setReadyPlan(ICraftingPlan plan) {
         this.readyPlan = plan;
         var level = this.cannonLogic.getLevel();
         this.readyPlanSinceTick = level != null ? level.getGameTime() : -1;
+        this.nextReadyPlanRetryTick = this.readyPlanSinceTick + SUBMIT_RETRY_DELAY_TICKS;
     }
 
     public void clearReadyPlan() {
         this.readyPlan = null;
         this.readyPlanSinceTick = -1;
+        this.nextReadyPlanRetryTick = 0;
+    }
+
+    public boolean tryScheduleReadyPlanRetry(long currentTick) {
+        if (readyPlan == null || currentTick < nextReadyPlanRetryTick) return false;
+        nextReadyPlanRetryTick = currentTick + SUBMIT_RETRY_DELAY_TICKS;
+        return true;
+    }
+
+    public long getReadyPlanSinceTick() {
+        return this.readyPlanSinceTick;
     }
 }

@@ -136,13 +136,14 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
 
         var blueprint = inventory.getStackInSlot(0);
         this.schematicenergistics$cannonInterface.setStatusMsg(statusMsg);
-        this.schematicenergistics$cannonInterface.setState(state.toString());
         if (!blueprint.isEmpty() && blueprint.getTag() != null) {
             this.schematicenergistics$cannonInterface.setSchematicName(blueprint.getTag().getString("File"));
         } else {
             this.schematicenergistics$cannonInterface.setSchematicName(null);
             this.schematicenergistics$cannonInterface.setItem(null);
         }
+
+        this.schematicenergistics$cannonInterface.setState(state.toString());
 
         if (missingItem != null) {
             var key = AEItemKey.of(missingItem);
@@ -151,7 +152,9 @@ public abstract class SchematicCannonMixin implements ISchematicAccessor {
             }
         }
 
-        int maxStackSize = this.inventory.getStackInSlot(4).getMaxStackSize();
+        if (state == SchematicannonBlockEntity.State.STOPPED) return;
+
+        int maxStackSize = Items.GUNPOWDER.getMaxStackSize();
         int currentAmountOnSlot = this.inventory.getStackInSlot(4).getCount();
         if (currentAmountOnSlot >= maxStackSize) return;
         int amountToRefill = maxStackSize - currentAmountOnSlot;

@@ -30,14 +30,12 @@ import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.ExecutionException;
 import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
-import static org.openjdk.nashorn.internal.runtime.regexp.joni.Config.log;
 
 public class CannonInterfaceLogic {
     private static final Logger log = LoggerFactory.getLogger(CannonInterfaceLogic.class);
@@ -66,6 +64,7 @@ public class CannonInterfaceLogic {
     private final Map<AEItemKey, CraftingHelper> pendingCraftingJobs = new HashMap<>();
 
     private SchematicannonBlockEntity cannonEntity;
+    private long lastRefillTick = Long.MIN_VALUE;
 
     private BlockPos terminalPos = null;
 
@@ -164,7 +163,7 @@ public class CannonInterfaceLogic {
         var craftingService = grid.getCraftingService();
         if (inventory == null || craftingService == null) return false;
 
-        long available = inventory.getAvailableStacks().get(what);
+        long available = inventory.extract(what, amount, Actionable.SIMULATE, this.actionSource);
         if (available >= amount) {
             if (!simulate) {
                 inventory.extract(what, amount, Actionable.MODULATE, this.actionSource);
@@ -197,9 +196,13 @@ public class CannonInterfaceLogic {
         var grid = node.getGrid();
         if (grid == null) return 0;
 
+        long currentTick = level.getGameTime();
+        if (lastRefillTick == currentTick) return 0;
+        lastRefillTick = currentTick;
+
         MEStorage inventory = grid.getStorageService().getInventory();
         AEItemKey gunpowderKey = AEItemKey.of(Items.GUNPOWDER);
-        long available = inventory.getAvailableStacks().get(gunpowderKey);
+        long available = inventory.extract(gunpowderKey, amount, Actionable.SIMULATE, this.actionSource);
         if (available <= 0) {
             if (!this.gunpowderCraftingState) return 0;
             var canCraft = grid.getCraftingService().isCraftable(gunpowderKey);
@@ -278,6 +281,7 @@ public class CannonInterfaceLogic {
                         it.remove();
                         continue;
                     }
+                    if (!helper.tryScheduleReadyPlanRetry(now)) continue;
                 }
 
                 var result = node.getGrid().getCraftingService().submitJob(
@@ -326,6 +330,8 @@ public class CannonInterfaceLogic {
                     } else {
                         helper.setReadyPlan(plan);
                     }
+                } else {
+                    helper.deferCalculationRetry();
                 }
             } catch (ExecutionException | InterruptedException e) {
                 e.printStackTrace();
@@ -389,16 +395,17 @@ public class CannonInterfaceLogic {
 
     public void setState(String state) {
         this.state = state;
+        if ("STOPPED".equals(state)) {
+            cancelAllPendingCrafts();
+            this.hasPreCrafted = false;
+            this.isPreCrafting = false;
+            this.pendingCraftingJobs.clear();
+        }
         if (bulkCraftState) {
             if (isPreCrafting) {
                 setStatusMsg("BULK_CRAFTING");
             }
-            if ("STOPPED".equals(state)) {
-                cancelAllPendingCrafts();
-                this.hasPreCrafted = false;
-                this.isPreCrafting = false;
-                this.pendingCraftingJobs.clear();
-            }
+
 
             if ("RUNNING".equals(state) && !hasPreCrafted && !isPreCrafting) {
                 if (startPreCrafting()) {
@@ -532,12 +539,13 @@ public class CannonInterfaceLogic {
         }
 
         boolean startedAny = false;
+        var availableStacks = storage.getAvailableStacks();
 
         for (Map.Entry<AEItemKey, Long> entry : totalRequired.entrySet()) {
             AEItemKey key = entry.getKey();
             long needed = entry.getValue();
 
-            long available = storage.getAvailableStacks().get(key);
+            long available = availableStacks.get(key);
 
             if (available >= needed) {
                 continue;
@@ -566,24 +574,14 @@ public class CannonInterfaceLogic {
     }
 
     private void cancelAllPendingCrafts() {
-
-        for (Map.Entry<AEItemKey, CraftingHelper> entry : pendingCraftingJobs.entrySet()) {
-            CraftingHelper helper = entry.getValue();
-            if (helper.getLink() != null) {
-                try {
-                    helper.getLink().cancel();
-                } catch (Exception e) {
-                    log.error("Failed to cancel craft link for {}", entry.getKey(), e);
-                }
-                helper.setLink(null);
-            }
-
-            if (helper.getPendingCraft() != null) {
-                helper.clearPendingCraft();
-            }
-
-            if (helper.getReadyPlan() != null) {
-                helper.clearReadyPlan();
+        var helpers = new ArrayList<>(pendingCraftingJobs.values());
+        helpers.add(craftingHelper);
+        helpers.add(gunpowderCraftingHelper);
+        for (CraftingHelper helper : helpers) {
+            try {
+                helper.cancel();
+            } catch (Exception e) {
+                log.error("Failed to cancel craft", e);
             }
         }
     }
